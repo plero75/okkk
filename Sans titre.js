@@ -560,12 +560,6 @@ function regrouperOccupationsEspaceParEvent_(items) {
 
 function calculerDureeDepuisDates_(debut, fin) {
   const ms = fin - debut;
-  if (ms < 0) {
-    logDebug_(
-      "calculerDureeDepuisDates_",
-      "durée négative détectée entre " + debut + " et " + fin
-    );
-  }
   const minutesTotal = Math.round(ms / (1000 * 60));
   const jours = Math.floor(minutesTotal / (60 * 24));
 
@@ -597,14 +591,7 @@ function construireSetJoursCourses_(eventsCourses, H) {
     const sd = new Date(s.getFullYear(), s.getMonth(), s.getDate());
     const ed = new Date(e.getFullYear(), e.getMonth(), e.getDate());
 
-    if (ed < sd) {
-      plagesInvalides += 1;
-      logDebug_(
-        "construireSetJoursCourses_",
-        "plage ignorée pour " + (ev.summary || "(sans titre)") + " car end < start"
-      );
-      return;
-    }
+    if (ed < sd) return;
 
     for (let d = new Date(sd); d <= ed; d.setDate(d.getDate() + 1)) {
       joursCourses.add(H.getKeyDate(d));
