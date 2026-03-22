@@ -137,6 +137,50 @@ function nettoyerTitreOption(titre) {
     .trim();
 }
 
+function normaliserNomEvenementRegroupe_(titre) {
+  const original = String(titre || "").trim();
+  if (!original) return "";
+
+  const sansOption = nettoyerTitreOption(original);
+  const nomNormalise = sansOption
+    .replace(/^\s*(MONTAGE|DEMONTAGE|DÉMONTAGE|EXPLOITATION)\b[\s:–-]*/i, "")
+    .replace(/[\s:–-]*\b(MONTAGE|DEMONTAGE|DÉMONTAGE|EXPLOITATION)\b\s*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return nomNormalise || sansOption || original;
+}
+
+function normaliserPhases_(phasesInput) {
+  const ordre = ["MONTAGE", "EXPLOITATION", "DEMONTAGE"];
+  const phases = Array.isArray(phasesInput)
+    ? phasesInput.slice()
+    : Array.from(phasesInput || []);
+
+  return ordre.filter(phase => phases.indexOf(phase) !== -1);
+}
+
+function getPhaseUnique_(phasesInput) {
+  const phases = normaliserPhases_(phasesInput);
+  return phases.length === 1 ? phases[0] : "";
+}
+
+function libellerPhases_(phasesInput) {
+  const labels = {
+    MONTAGE: "Montage",
+    EXPLOITATION: "Exploitation",
+    DEMONTAGE: "Démontage"
+  };
+
+  return normaliserPhases_(phasesInput)
+    .map(phase => labels[phase] || phase)
+    .join(" / ");
+}
+
+function libellerPhasesGroupe_(groupe) {
+  return libellerPhases_(groupe && groupe.phases ? groupe.phases : []);
+}
+
 
 function genererApercuRecapVincennesP1(formData) {
   const start = parserDateISO_P1_(formData.dateDebut, false);
@@ -494,25 +538,32 @@ function regrouperEventsGlobal_(events) {
   const groupes = {};
 
   events.forEach(ev => {
-    const nom = String(ev.summary || "").trim();
-    if (!nom) return;
+    const nomOriginal = String(ev.summary || "").trim();
+    if (!nomOriginal) return;
+    const nom = normaliserNomEvenementRegroupe_(nomOriginal);
+    const isOption = detecterOptionEvent(nomOriginal);
+    const phase = detecterPhaseEvent(nomOriginal);
+    const key = (isOption ? "OPTION|" : "STD|") + nom.toUpperCase();
 
     const start = new Date(ev.start.date || ev.start.dateTime);
     const end = new Date(ev.end.date || ev.end.dateTime);
 
-    if (!groupes[nom]) {
-      groupes[nom] = {
+    if (!groupes[key]) {
+      groupes[key] = {
         nom: nom,
         events: [],
         debutMin: start,
         finMax: end,
-        espaces: new Set()
+        espaces: new Set(),
+        isOption: isOption,
+        phases: new Set()
       };
     }
 
-    groupes[nom].events.push(ev);
-    if (start < groupes[nom].debutMin) groupes[nom].debutMin = start;
-    if (end > groupes[nom].finMax) groupes[nom].finMax = end;
+    groupes[key].events.push(ev);
+    groupes[key].phases.add(phase);
+    if (start < groupes[key].debutMin) groupes[key].debutMin = start;
+    if (end > groupes[key].finMax) groupes[key].finMax = end;
   });
 
   return Object.values(groupes);
@@ -747,9 +798,10 @@ groupesDuMois
   })
   .forEach(groupe => {
     const type = H.detecterType(groupe.events[0]);
-    const phase = detecterPhaseEvent(groupe.nom);
-const isOption = detecterOptionEvent(groupe.nom);
+    const phase = getPhaseUnique_(groupe.phases);
+const isOption = !!groupe.isOption;
 let nomAffiche = groupe.nom;
+const phasesLibelle = libellerPhasesGroupe_(groupe);
 
 if (isOption) {
   nomAffiche = "[OPTION] - " + nettoyerTitreOption(groupe.nom);
@@ -798,7 +850,7 @@ if (isOption) {
       color:${couleurTexte};
       vertical-align:top;
       ${isOption ? "font-style:italic; opacity:0.9;" : ""}
-    ">${isOption ? "◇ " : ""}${nomAffiche}</td>`;
+    ">${isOption ? "◇ " : ""}${nomAffiche}${phasesLibelle ? `<div style="margin-top:2px;font-size:9px;font-weight:600;color:#6b7280;">${phasesLibelle}</div>` : ""}</td>`;
 
     for (let j = 1; j <= nbJours; j++) {
       const current = new Date(annee, moisIndex, j);
@@ -883,8 +935,8 @@ if (isOption) {
           </tr>`;
 
 eventsGroupes.forEach(groupe => {
-  const phase = detecterPhaseEvent(groupe.nom);
-  const isOption = detecterOptionEvent(groupe.nom);
+  const phase = getPhaseUnique_(groupe.phases);
+  const isOption = !!groupe.isOption;
     const evRef = groupe.events[0];
     const evStart = groupe.debutMin;
     const evEnd = groupe.finMax;
@@ -978,7 +1030,8 @@ Object.keys(recapEspaces)
 
     itemsGroupes.forEach(item => {
       const isOption = detecterOptionEvent(item.event);
-      const phase = detecterPhaseEvent(item.event);
+      const phase = getPhaseUnique_(item.phases);
+      const phasesLibelle = libellerPhases_(item.phases);
 
       const memeJour =
         item.debut.getFullYear() === item.fin.getFullYear() &&
@@ -1071,6 +1124,7 @@ Object.keys(recapEspaces)
             ${isOption ? "font-style:italic; opacity:0.85;" : ""}
           ">
 ${isOption ? "◇ " : ""}${nettoyerTitreOption(item.event)}
+            ${phasesLibelle ? `<div style="margin-top:4px;font-size:11px;font-weight:600;color:#6b7280;">${phasesLibelle}</div>` : ""}
             ${isOption ? `
               <span style="
                 margin-left:8px;

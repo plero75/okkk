@@ -111,8 +111,8 @@ function construireExportMensuel_(eventsGroupes, joursCourses, start, end, H, da
     .forEach(groupe => {
       const evRef = groupe.events[0];
       const type = H.detecterType(evRef);
-      const phase = detecterPhaseEvent(groupe.nom);
-      const isOption = detecterOptionEvent(groupe.nom) ? "Oui" : "";
+      const phase = libellerPhasesGroupe_(groupe);
+      const isOption = groupe.isOption ? "Oui" : "";
       const toucheCourse = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
       const mois = `${groupe.debutMin.getMonth() + 1}/${groupe.debutMin.getFullYear()}`;
 
