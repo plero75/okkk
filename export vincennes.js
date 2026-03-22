@@ -277,6 +277,11 @@ function construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt
       });
     });
 
+  logDebug_(
+    "construireExportParEspace_",
+    "espaces=" + Object.keys(recapEspaces).length + ", lignesExport=" + (rows.length - 1)
+  );
+
   const html = construireHtmlTableSimple_(
     title,
     `Période du ${dateDebutTxt} au ${dateFinTxt}`,

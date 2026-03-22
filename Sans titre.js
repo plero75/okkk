@@ -518,12 +518,20 @@ function regrouperEventsGlobal_(events) {
   return Object.values(groupes);
 }
 
+function logDebug_(scope, message) {
+  const ligne = "[" + scope + "] " + message;
+  Logger.log(ligne);
+  if (typeof console !== "undefined" && console.log) console.log(ligne);
+}
+
 function regrouperOccupationsEspaceParEvent_(items) {
   const groupes = {};
+  let typesManquants = 0;
 
   items.forEach(item => {
     const key = String(item.event || "").trim();
     if (!key) return;
+    if (!item.type) typesManquants += 1;
 
     if (!groupes[key]) {
       groupes[key] = {
@@ -541,7 +549,13 @@ function regrouperOccupationsEspaceParEvent_(items) {
     }
   });
 
-  return Object.values(groupes).sort((a, b) => a.debut - b.debut);
+  const resultat = Object.values(groupes).sort((a, b) => a.debut - b.debut);
+  logDebug_(
+    "regrouperOccupationsEspaceParEvent_",
+    "items=" + items.length + ", groupes=" + resultat.length + ", typesManquants=" + typesManquants
+  );
+
+  return resultat;
 }
 
 function calculerDureeDepuisDates_(debut, fin) {
@@ -569,6 +583,7 @@ function listerEventsCalendar_(calendarId, start, end, maxResults) {
 
 function construireSetJoursCourses_(eventsCourses, H) {
   const joursCourses = new Set();
+  let plagesInvalides = 0;
 
   eventsCourses.forEach(ev => {
     const s = new Date(ev.start.date || ev.start.dateTime);
@@ -582,6 +597,11 @@ function construireSetJoursCourses_(eventsCourses, H) {
       joursCourses.add(H.getKeyDate(d));
     }
   });
+
+  logDebug_(
+    "construireSetJoursCourses_",
+    "eventsCourses=" + eventsCourses.length + ", joursCourses=" + joursCourses.size + ", plagesInvalides=" + plagesInvalides
+  );
 
   return joursCourses;
 }
