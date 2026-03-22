@@ -803,43 +803,12 @@ const isOption = !!groupe.isOption;
 let nomAffiche = groupe.nom;
 const phasesLibelle = libellerPhasesGroupe_(groupe);
 
-if (isOption) {
-  nomAffiche = "[OPTION] - " + nettoyerTitreOption(groupe.nom);
-}
- 
- 
     let couleurTexte = H.couleurTexteType(type);
-    let couleurBarre = H.couleurBarreType(type);
     let hauteurBarre = "8px";
 
     if (isOption) {
-     if (isOption) {
-  // ✅ on garde la couleur texte d’origine
-  couleurBarre = (type === "B2B")
-    ? "rgba(124,58,237,0.16)"
-    : "rgba(2,132,199,0.16)";
-  hauteurBarre = "6px";
-}
-    } else if (phase === "MONTAGE") {
-      couleurBarre = (type === "B2B")
-        ? "rgba(139,92,246,0.40)"
-        : "rgba(14,165,233,0.40)";
-    } else if (phase === "DEMONTAGE") {
-      couleurBarre = (type === "B2B")
-        ? "rgba(139,92,246,0.24)"
-        : "rgba(14,165,233,0.24)";
+      hauteurBarre = "6px";
     }
-
-    const sd = new Date(
-      groupe.debutMin.getFullYear(),
-      groupe.debutMin.getMonth(),
-      groupe.debutMin.getDate()
-    );
-    const ed = new Date(
-      groupe.finMax.getFullYear(),
-      groupe.finMax.getMonth(),
-      groupe.finMax.getDate()
-    );
 
     html += `<tr><td style="
       border-bottom:1px solid #e5e7eb;
@@ -859,16 +828,36 @@ if (isOption) {
       const isCourseDay = joursCourses.has(H.getKeyDate(current));
 
       const cellStyle = `border-bottom:1px solid #eef2f7;text-align:center;padding:1px 0;position:relative;${isCourseDay ? "box-shadow: inset 0 -2px 0 #f59e0b;" : ""}`;
+      const segmentsActifs = segments.filter(segment => current >= segment.sd && current <= segment.ed);
+      const phasePriorites = ["EXPLOITATION", "MONTAGE", "DEMONTAGE"];
+      const segmentActif = phasePriorites
+        .map(phaseCourante => segmentsActifs.find(segment => segment.phase === phaseCourante))
+        .find(Boolean) || null;
 
-      const actif = current >= sd && current <= ed;
-      const actifAvant = prev >= sd && prev <= ed;
-      const actifApres = next >= sd && next <= ed;
-
-      if (actif) {
+      if (segmentActif) {
+        const segmentsAvant = segments.filter(segment => prev >= segment.sd && prev <= segment.ed);
+        const segmentsApres = segments.filter(segment => next >= segment.sd && next <= segment.ed);
+        const actifAvant = segmentsAvant.some(segment => segment.phase === segmentActif.phase);
+        const actifApres = segmentsApres.some(segment => segment.phase === segmentActif.phase);
         let radius = "0";
         if (!actifAvant && !actifApres) radius = "999px";
         else if (!actifAvant && actifApres) radius = "999px 0 0 999px";
         else if (actifAvant && !actifApres) radius = "0 999px 999px 0";
+
+        let couleurBarre = H.couleurBarreType(type);
+        if (isOption) {
+          couleurBarre = (type === "B2B")
+            ? "rgba(124,58,237,0.16)"
+            : "rgba(2,132,199,0.16)";
+        } else if (segmentActif.phase === "MONTAGE") {
+          couleurBarre = (type === "B2B")
+            ? "rgba(139,92,246,0.40)"
+            : "rgba(14,165,233,0.40)";
+        } else if (segmentActif.phase === "DEMONTAGE") {
+          couleurBarre = (type === "B2B")
+            ? "rgba(139,92,246,0.24)"
+            : "rgba(14,165,233,0.24)";
+        }
 
         let ligneOptionHtml = "";
 
