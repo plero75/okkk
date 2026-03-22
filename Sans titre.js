@@ -571,11 +571,8 @@ function regrouperEventsGlobal_(events) {
 
 function logDebug_(scope, message) {
   const ligne = "[" + scope + "] " + message;
-  if (typeof console !== "undefined" && console.log) {
-    console.log(ligne);
-    return;
-  }
   Logger.log(ligne);
+  if (typeof console !== "undefined" && console.log) console.log(ligne);
 }
 
 function regrouperOccupationsEspaceParEvent_(items) {
@@ -594,38 +591,26 @@ function regrouperOccupationsEspaceParEvent_(items) {
         fin: item.fin,
         course: !!item.course,
         type: item.type || "",
-        phases: normaliserPhases_(item.phases),
       };
     } else {
       if (item.debut < groupes[key].debut) groupes[key].debut = item.debut;
       if (item.fin > groupes[key].fin) groupes[key].fin = item.fin;
       if (item.course) groupes[key].course = true;
       if (!groupes[key].type && item.type) groupes[key].type = item.type;
-      groupes[key].phases = normaliserPhases_(
-        groupes[key].phases.concat(normaliserPhases_(item.phases))
-      );
     }
   });
 
   const resultat = Object.values(groupes).sort((a, b) => a.debut - b.debut);
-  if (typesManquants > 0) {
-    logDebug_(
-      "regrouperOccupationsEspaceParEvent_",
-      "items=" + items.length + ", groupes=" + resultat.length + ", typesManquants=" + typesManquants
-    );
-  }
+  logDebug_(
+    "regrouperOccupationsEspaceParEvent_",
+    "items=" + items.length + ", groupes=" + resultat.length + ", typesManquants=" + typesManquants
+  );
 
   return resultat;
 }
 
 function calculerDureeDepuisDates_(debut, fin) {
   const ms = fin - debut;
-  if (ms < 0) {
-    logDebug_(
-      "calculerDureeDepuisDates_",
-      "durée négative détectée entre " + debut + " et " + fin
-    );
-  }
   const minutesTotal = Math.round(ms / (1000 * 60));
   const jours = Math.floor(minutesTotal / (60 * 24));
 
@@ -657,26 +642,17 @@ function construireSetJoursCourses_(eventsCourses, H) {
     const sd = new Date(s.getFullYear(), s.getMonth(), s.getDate());
     const ed = new Date(e.getFullYear(), e.getMonth(), e.getDate());
 
-    if (ed < sd) {
-      plagesInvalides += 1;
-      logDebug_(
-        "construireSetJoursCourses_",
-        "plage ignorée pour " + (ev.summary || "(sans titre)") + " car end < start"
-      );
-      return;
-    }
+    if (ed < sd) return;
 
     for (let d = new Date(sd); d <= ed; d.setDate(d.getDate() + 1)) {
       joursCourses.add(H.getKeyDate(d));
     }
   });
 
-  if (plagesInvalides > 0) {
-    logDebug_(
-      "construireSetJoursCourses_",
-      "eventsCourses=" + eventsCourses.length + ", joursCourses=" + joursCourses.size + ", plagesInvalides=" + plagesInvalides
-    );
-  }
+  logDebug_(
+    "construireSetJoursCourses_",
+    "eventsCourses=" + eventsCourses.length + ", joursCourses=" + joursCourses.size + ", plagesInvalides=" + plagesInvalides
+  );
 
   return joursCourses;
 }
@@ -988,8 +964,7 @@ eventsGroupes.forEach(groupe => {
               debut: groupe.debutMin,
               fin: groupe.finMax,
               course: reunion === "✓",
-              type: type,
-              phases: normaliserPhases_(groupe.phases)
+              type: type
             });
           }
         });
