@@ -518,40 +518,68 @@ function regrouperEventsGlobal_(events) {
   return Object.values(groupes);
 }
 
+function logDebug_(scope, message) {
+  const ligne = "[" + scope + "] " + message;
+  if (typeof console !== "undefined" && console.log) {
+    console.log(ligne);
+    return;
+  }
+  Logger.log(ligne);
+}
+
 function regrouperOccupationsEspaceParEvent_(items) {
   const groupes = {};
+  let typesManquants = 0;
 
   items.forEach(item => {
     const key = String(item.event || "").trim();
     if (!key) return;
+    if (!item.type) typesManquants += 1;
 
     if (!groupes[key]) {
       groupes[key] = {
         event: item.event,
         debut: item.debut,
         fin: item.fin,
-        course: !!item.course
+        course: !!item.course,
+        type: item.type || "",
       };
     } else {
       if (item.debut < groupes[key].debut) groupes[key].debut = item.debut;
       if (item.fin > groupes[key].fin) groupes[key].fin = item.fin;
       if (item.course) groupes[key].course = true;
+      if (!groupes[key].type && item.type) groupes[key].type = item.type;
     }
   });
 
-  return Object.values(groupes).sort((a, b) => a.debut - b.debut);
+  const resultat = Object.values(groupes).sort((a, b) => a.debut - b.debut);
+  if (typesManquants > 0) {
+    logDebug_(
+      "regrouperOccupationsEspaceParEvent_",
+      "items=" + items.length + ", groupes=" + resultat.length + ", typesManquants=" + typesManquants
+    );
+  }
+
+  return resultat;
 }
 
 function calculerDureeDepuisDates_(debut, fin) {
   const ms = fin - debut;
-  const jours = Math.round(ms / (1000 * 60 * 60 * 24));
+  if (ms < 0) {
+    logDebug_(
+      "calculerDureeDepuisDates_",
+      "durée négative détectée entre " + debut + " et " + fin
+    );
+  }
+  const minutesTotal = Math.round(ms / (1000 * 60));
+  const jours = Math.floor(minutesTotal / (60 * 24));
 
   if (jours > 1) return jours + " jours";
   if (jours === 1) return "1 jour";
 
-  const h = Math.floor(ms / (1000 * 60 * 60));
-  const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  return h + "h" + (m > 0 ? String(m).padStart(2, "0") : "00");
+  const heures = Math.floor(minutesTotal / 60);
+  const minutes = minutesTotal % 60;
+  return heures + "h" + String(minutes).padStart(2, "0");
 }
 
 function listerEventsCalendar_(calendarId, start, end, maxResults) {
@@ -566,6 +594,7 @@ function listerEventsCalendar_(calendarId, start, end, maxResults) {
 
 function construireSetJoursCourses_(eventsCourses, H) {
   const joursCourses = new Set();
+  let plagesInvalides = 0;
 
   eventsCourses.forEach(ev => {
     const s = new Date(ev.start.date || ev.start.dateTime);
@@ -573,10 +602,26 @@ function construireSetJoursCourses_(eventsCourses, H) {
     const sd = new Date(s.getFullYear(), s.getMonth(), s.getDate());
     const ed = new Date(e.getFullYear(), e.getMonth(), e.getDate());
 
+    if (ed < sd) {
+      plagesInvalides += 1;
+      logDebug_(
+        "construireSetJoursCourses_",
+        "plage ignorée pour " + (ev.summary || "(sans titre)") + " car end < start"
+      );
+      return;
+    }
+
     for (let d = new Date(sd); d <= ed; d.setDate(d.getDate() + 1)) {
       joursCourses.add(H.getKeyDate(d));
     }
   });
+
+  if (plagesInvalides > 0) {
+    logDebug_(
+      "construireSetJoursCourses_",
+      "eventsCourses=" + eventsCourses.length + ", joursCourses=" + joursCourses.size + ", plagesInvalides=" + plagesInvalides
+    );
+  }
 
   return joursCourses;
 }
@@ -886,7 +931,8 @@ eventsGroupes.forEach(groupe => {
               event: groupe.nom,
               debut: groupe.debutMin,
               fin: groupe.finMax,
-              course: reunion === "✓"
+              course: reunion === "✓",
+              type: type
             });
           }
         });

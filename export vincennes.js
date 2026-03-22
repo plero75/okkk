@@ -266,17 +266,27 @@ function construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt
       const itemsGroupes = regrouperOccupationsEspaceParEvent_(recapEspaces[espace]);
 
       itemsGroupes.forEach(item => {
-        const found = recapEspaces[espace].find(x => x.event === item.event);
+        if (!item.type) {
+          logDebug_(
+            "construireExportParEspace_",
+            "type manquant pour espace=" + espace + ", event=" + item.event
+          );
+        }
         rows.push([
           espace,
           Utilities.formatDate(item.debut, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm"),
           Utilities.formatDate(item.fin, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm"),
           item.event,
           item.course ? "Oui" : "",
-          found ? found.type : ""
+          item.type || ""
         ]);
       });
     });
+
+  logDebug_(
+    "construireExportParEspace_",
+    "espaces=" + Object.keys(recapEspaces).length + ", lignesExport=" + (rows.length - 1)
+  );
 
   const html = construireHtmlTableSimple_(
     title,
@@ -318,19 +328,24 @@ function construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDeb
     ]);
   });
 
-  rows.sort((a, b) => {
-    if (a[0] === "Responsable") return -1;
-    if (b[0] === "Responsable") return 1;
-    return String(a[0]).localeCompare(String(b[0]), "fr", { sensitivity: "base" });
-  });
+  const header = rows[0];
+  const dataRows = rows.slice(1).sort((a, b) =>
+    String(a[0]).localeCompare(String(b[0]), "fr", { sensitivity: "base" })
+  );
+  const sortedRows = [header].concat(dataRows);
+
+  logDebug_(
+    "construireExportParResponsable_",
+    "responsables=" + dataRows.length + ", premierResponsable=" + (dataRows[0] ? dataRows[0][0] : "")
+  );
 
   const html = construireHtmlTableSimple_(
     title,
     `Période du ${dateDebutTxt} au ${dateFinTxt}`,
-    rows
+    sortedRows
   );
 
-  return { title, rows, html };
+  return { title, rows: sortedRows, html };
 }
 
 function construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, filtre) {
