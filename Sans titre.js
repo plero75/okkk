@@ -137,6 +137,53 @@ function nettoyerTitreOption(titre) {
     .trim();
 }
 
+function normaliserNomEvenementRegroupe_(titre) {
+  const original = String(titre || "").trim();
+  if (!original) return "";
+
+  const sansOption = nettoyerTitreOption(original);
+  const nomNormalise = sansOption
+    .replace(/\b(?:mini[\s-]*)?(MONTAGE|DEMONTAGE|DÉMONTAGE|EXPLOITATION)\b/gi, "")
+    .replace(/\bet\b/gi, " ")
+    .replace(/\s*-\s*/g, " - ")
+    .replace(/(?:\s+-\s+){2,}/g, " - ")
+    .replace(/^\s*-\s*|\s*-\s*$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return nomNormalise || sansOption || original;
+}
+
+function normaliserPhases_(phasesInput) {
+  const ordre = ["MONTAGE", "EXPLOITATION", "DEMONTAGE"];
+  const phases = Array.isArray(phasesInput)
+    ? phasesInput.slice()
+    : Array.from(phasesInput || []);
+
+  return ordre.filter(phase => phases.indexOf(phase) !== -1);
+}
+
+function getPhaseUnique_(phasesInput) {
+  const phases = normaliserPhases_(phasesInput);
+  return phases.length === 1 ? phases[0] : "";
+}
+
+function libellerPhases_(phasesInput) {
+  const labels = {
+    MONTAGE: "Montage",
+    EXPLOITATION: "Exploitation",
+    DEMONTAGE: "Démontage"
+  };
+
+  return normaliserPhases_(phasesInput)
+    .map(phase => labels[phase] || phase)
+    .join(" / ");
+}
+
+function libellerPhasesGroupe_(groupe) {
+  return libellerPhases_(groupe && groupe.phases ? groupe.phases : []);
+}
+
 
 function genererApercuRecapVincennesP1(formData) {
   const start = parserDateISO_P1_(formData.dateDebut, false);
@@ -494,64 +541,103 @@ function regrouperEventsGlobal_(events) {
   const groupes = {};
 
   events.forEach(ev => {
-    const nom = String(ev.summary || "").trim();
-    if (!nom) return;
+    const nomOriginal = String(ev.summary || "").trim();
+    if (!nomOriginal) return;
+    const nom = normaliserNomEvenementRegroupe_(nomOriginal);
+    const isOption = detecterOptionEvent(nomOriginal);
+    const phase = detecterPhaseEvent(nomOriginal);
+    const key = (isOption ? "OPTION|" : "STD|") + nom.toUpperCase();
 
     const start = new Date(ev.start.date || ev.start.dateTime);
     const end = new Date(ev.end.date || ev.end.dateTime);
 
-    if (!groupes[nom]) {
-      groupes[nom] = {
+    if (!groupes[key]) {
+      groupes[key] = {
         nom: nom,
         events: [],
         debutMin: start,
         finMax: end,
-        espaces: new Set()
+        espaces: new Set(),
+        isOption: isOption,
+        phases: new Set()
       };
     }
 
-    groupes[nom].events.push(ev);
-    if (start < groupes[nom].debutMin) groupes[nom].debutMin = start;
-    if (end > groupes[nom].finMax) groupes[nom].finMax = end;
+    groupes[key].events.push(ev);
+    groupes[key].phases.add(phase);
+    if (start < groupes[key].debutMin) groupes[key].debutMin = start;
+    if (end > groupes[key].finMax) groupes[key].finMax = end;
   });
 
   return Object.values(groupes);
 }
 
+function logDebug_(scope, message) {
+  const ligne = "[" + scope + "] " + message;
+  if (typeof console !== "undefined" && console.log) {
+    console.log(ligne);
+    return;
+  }
+  Logger.log(ligne);
+}
+
 function regrouperOccupationsEspaceParEvent_(items) {
   const groupes = {};
+  let typesManquants = 0;
 
   items.forEach(item => {
     const key = String(item.event || "").trim();
     if (!key) return;
+    if (!item.type) typesManquants += 1;
 
     if (!groupes[key]) {
       groupes[key] = {
         event: item.event,
         debut: item.debut,
         fin: item.fin,
-        course: !!item.course
+        course: !!item.course,
+        type: item.type || "",
+        phases: normaliserPhases_(item.phases),
       };
     } else {
       if (item.debut < groupes[key].debut) groupes[key].debut = item.debut;
       if (item.fin > groupes[key].fin) groupes[key].fin = item.fin;
       if (item.course) groupes[key].course = true;
+      if (!groupes[key].type && item.type) groupes[key].type = item.type;
+      groupes[key].phases = normaliserPhases_(
+        groupes[key].phases.concat(normaliserPhases_(item.phases))
+      );
     }
   });
 
-  return Object.values(groupes).sort((a, b) => a.debut - b.debut);
+  const resultat = Object.values(groupes).sort((a, b) => a.debut - b.debut);
+  if (typesManquants > 0) {
+    logDebug_(
+      "regrouperOccupationsEspaceParEvent_",
+      "items=" + items.length + ", groupes=" + resultat.length + ", typesManquants=" + typesManquants
+    );
+  }
+
+  return resultat;
 }
 
 function calculerDureeDepuisDates_(debut, fin) {
   const ms = fin - debut;
-  const jours = Math.round(ms / (1000 * 60 * 60 * 24));
+  if (ms < 0) {
+    logDebug_(
+      "calculerDureeDepuisDates_",
+      "durée négative détectée entre " + debut + " et " + fin
+    );
+  }
+  const minutesTotal = Math.round(ms / (1000 * 60));
+  const jours = Math.floor(minutesTotal / (60 * 24));
 
   if (jours > 1) return jours + " jours";
   if (jours === 1) return "1 jour";
 
-  const h = Math.floor(ms / (1000 * 60 * 60));
-  const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  return h + "h" + (m > 0 ? String(m).padStart(2, "0") : "00");
+  const heures = Math.floor(minutesTotal / 60);
+  const minutes = minutesTotal % 60;
+  return heures + "h" + String(minutes).padStart(2, "0");
 }
 
 function listerEventsCalendar_(calendarId, start, end, maxResults) {
@@ -566,6 +652,7 @@ function listerEventsCalendar_(calendarId, start, end, maxResults) {
 
 function construireSetJoursCourses_(eventsCourses, H) {
   const joursCourses = new Set();
+  let plagesInvalides = 0;
 
   eventsCourses.forEach(ev => {
     const s = new Date(ev.start.date || ev.start.dateTime);
@@ -573,10 +660,26 @@ function construireSetJoursCourses_(eventsCourses, H) {
     const sd = new Date(s.getFullYear(), s.getMonth(), s.getDate());
     const ed = new Date(e.getFullYear(), e.getMonth(), e.getDate());
 
+    if (ed < sd) {
+      plagesInvalides += 1;
+      logDebug_(
+        "construireSetJoursCourses_",
+        "plage ignorée pour " + (ev.summary || "(sans titre)") + " car end < start"
+      );
+      return;
+    }
+
     for (let d = new Date(sd); d <= ed; d.setDate(d.getDate() + 1)) {
       joursCourses.add(H.getKeyDate(d));
     }
   });
+
+  if (plagesInvalides > 0) {
+    logDebug_(
+      "construireSetJoursCourses_",
+      "eventsCourses=" + eventsCourses.length + ", joursCourses=" + joursCourses.size + ", plagesInvalides=" + plagesInvalides
+    );
+  }
 
   return joursCourses;
 }
@@ -722,47 +825,40 @@ groupesDuMois
   })
   .forEach(groupe => {
     const type = H.detecterType(groupe.events[0]);
-    const phase = detecterPhaseEvent(groupe.nom);
-const isOption = detecterOptionEvent(groupe.nom);
-let nomAffiche = groupe.nom;
+    const isOption = !!groupe.isOption;
+    let nomAffiche = groupe.nom;
+    const phasesLibelle = libellerPhasesGroupe_(groupe);
+    const segments = groupe.events
+      .map(ev => {
+        const sd = new Date(
+          new Date(ev.start.date || ev.start.dateTime).getFullYear(),
+          new Date(ev.start.date || ev.start.dateTime).getMonth(),
+          new Date(ev.start.date || ev.start.dateTime).getDate()
+        );
+        const ed = new Date(
+          new Date(ev.end.date || ev.end.dateTime).getFullYear(),
+          new Date(ev.end.date || ev.end.dateTime).getMonth(),
+          new Date(ev.end.date || ev.end.dateTime).getDate()
+        );
 
-if (isOption) {
-  nomAffiche = "[OPTION] - " + nettoyerTitreOption(groupe.nom);
-}
- 
- 
+        return {
+          phase: detecterPhaseEvent(ev.summary),
+          sd: sd,
+          ed: ed
+        };
+      })
+      .sort((a, b) => a.sd - b.sd);
+
+    if (isOption) {
+      nomAffiche = "[OPTION] - " + nettoyerTitreOption(groupe.nom);
+    }
+
     let couleurTexte = H.couleurTexteType(type);
-    let couleurBarre = H.couleurBarreType(type);
     let hauteurBarre = "8px";
 
     if (isOption) {
-     if (isOption) {
-  // ✅ on garde la couleur texte d’origine
-  couleurBarre = (type === "B2B")
-    ? "rgba(124,58,237,0.16)"
-    : "rgba(2,132,199,0.16)";
-  hauteurBarre = "6px";
-}
-    } else if (phase === "MONTAGE") {
-      couleurBarre = (type === "B2B")
-        ? "rgba(139,92,246,0.40)"
-        : "rgba(14,165,233,0.40)";
-    } else if (phase === "DEMONTAGE") {
-      couleurBarre = (type === "B2B")
-        ? "rgba(139,92,246,0.24)"
-        : "rgba(14,165,233,0.24)";
+      hauteurBarre = "6px";
     }
-
-    const sd = new Date(
-      groupe.debutMin.getFullYear(),
-      groupe.debutMin.getMonth(),
-      groupe.debutMin.getDate()
-    );
-    const ed = new Date(
-      groupe.finMax.getFullYear(),
-      groupe.finMax.getMonth(),
-      groupe.finMax.getDate()
-    );
 
     html += `<tr><td style="
       border-bottom:1px solid #e5e7eb;
@@ -773,7 +869,7 @@ if (isOption) {
       color:${couleurTexte};
       vertical-align:top;
       ${isOption ? "font-style:italic; opacity:0.9;" : ""}
-    ">${isOption ? "◇ " : ""}${nomAffiche}</td>`;
+    ">${isOption ? "◇ " : ""}${nomAffiche}${phasesLibelle ? `<div style="margin-top:2px;font-size:9px;font-weight:600;color:#6b7280;">${phasesLibelle}</div>` : ""}</td>`;
 
     for (let j = 1; j <= nbJours; j++) {
       const current = new Date(annee, moisIndex, j);
@@ -782,16 +878,36 @@ if (isOption) {
       const isCourseDay = joursCourses.has(H.getKeyDate(current));
 
       const cellStyle = `border-bottom:1px solid #eef2f7;text-align:center;padding:1px 0;position:relative;${isCourseDay ? "box-shadow: inset 0 -2px 0 #f59e0b;" : ""}`;
+      const segmentsActifs = segments.filter(segment => current >= segment.sd && current <= segment.ed);
+      const phasePriorites = ["EXPLOITATION", "MONTAGE", "DEMONTAGE"];
+      const segmentActif = phasePriorites
+        .map(phaseCourante => segmentsActifs.find(segment => segment.phase === phaseCourante))
+        .find(Boolean) || null;
 
-      const actif = current >= sd && current <= ed;
-      const actifAvant = prev >= sd && prev <= ed;
-      const actifApres = next >= sd && next <= ed;
-
-      if (actif) {
+      if (segmentActif) {
+        const segmentsAvant = segments.filter(segment => prev >= segment.sd && prev <= segment.ed);
+        const segmentsApres = segments.filter(segment => next >= segment.sd && next <= segment.ed);
+        const actifAvant = segmentsAvant.some(segment => segment.phase === segmentActif.phase);
+        const actifApres = segmentsApres.some(segment => segment.phase === segmentActif.phase);
         let radius = "0";
         if (!actifAvant && !actifApres) radius = "999px";
         else if (!actifAvant && actifApres) radius = "999px 0 0 999px";
         else if (actifAvant && !actifApres) radius = "0 999px 999px 0";
+
+        let couleurBarre = H.couleurBarreType(type);
+        if (isOption) {
+          couleurBarre = (type === "B2B")
+            ? "rgba(124,58,237,0.16)"
+            : "rgba(2,132,199,0.16)";
+        } else if (segmentActif.phase === "MONTAGE") {
+          couleurBarre = (type === "B2B")
+            ? "rgba(139,92,246,0.40)"
+            : "rgba(14,165,233,0.40)";
+        } else if (segmentActif.phase === "DEMONTAGE") {
+          couleurBarre = (type === "B2B")
+            ? "rgba(139,92,246,0.24)"
+            : "rgba(14,165,233,0.24)";
+        }
 
         let ligneOptionHtml = "";
 
@@ -858,8 +974,8 @@ if (isOption) {
           </tr>`;
 
 eventsGroupes.forEach(groupe => {
-  const phase = detecterPhaseEvent(groupe.nom);
-  const isOption = detecterOptionEvent(groupe.nom);
+  const phase = getPhaseUnique_(groupe.phases);
+  const isOption = !!groupe.isOption;
     const evRef = groupe.events[0];
     const evStart = groupe.debutMin;
     const evEnd = groupe.finMax;
@@ -886,7 +1002,9 @@ eventsGroupes.forEach(groupe => {
               event: groupe.nom,
               debut: groupe.debutMin,
               fin: groupe.finMax,
-              course: reunion === "✓"
+              course: reunion === "✓",
+              type: type,
+              phases: normaliserPhases_(groupe.phases)
             });
           }
         });
@@ -952,7 +1070,8 @@ Object.keys(recapEspaces)
 
     itemsGroupes.forEach(item => {
       const isOption = detecterOptionEvent(item.event);
-      const phase = detecterPhaseEvent(item.event);
+      const phase = getPhaseUnique_(item.phases);
+      const phasesLibelle = libellerPhases_(item.phases);
 
       const memeJour =
         item.debut.getFullYear() === item.fin.getFullYear() &&
@@ -1045,6 +1164,7 @@ Object.keys(recapEspaces)
             ${isOption ? "font-style:italic; opacity:0.85;" : ""}
           ">
 ${isOption ? "◇ " : ""}${nettoyerTitreOption(item.event)}
+            ${phasesLibelle ? `<div style="margin-top:4px;font-size:11px;font-weight:600;color:#6b7280;">${phasesLibelle}</div>` : ""}
             ${isOption ? `
               <span style="
                 margin-left:8px;
