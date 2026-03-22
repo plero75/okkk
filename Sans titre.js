@@ -535,21 +535,42 @@ function recapHelpersVincennesP1_() {
 }
 
 function regrouperEventsGlobal_(events) {
-  const groupes = {};
+  const groupesParBase = {};
+  const MAX_GROUPE_GAP_MS = 48 * 60 * 60 * 1000;
 
-  events.forEach(ev => {
+  const eventsTries = events.slice().sort((a, b) => {
+    const startA = new Date(a.start.date || a.start.dateTime).getTime();
+    const startB = new Date(b.start.date || b.start.dateTime).getTime();
+    return startA - startB;
+  });
+
+  eventsTries.forEach(ev => {
     const nomOriginal = String(ev.summary || "").trim();
     if (!nomOriginal) return;
+
     const nom = normaliserNomEvenementRegroupe_(nomOriginal);
     const isOption = detecterOptionEvent(nomOriginal);
     const phase = detecterPhaseEvent(nomOriginal);
-    const key = (isOption ? "OPTION|" : "STD|") + nom.toUpperCase();
-
+    const baseKey = (isOption ? "OPTION|" : "STD|") + nom.toUpperCase();
     const start = new Date(ev.start.date || ev.start.dateTime);
     const end = new Date(ev.end.date || ev.end.dateTime);
 
-    if (!groupes[key]) {
-      groupes[key] = {
+    if (!groupesParBase[baseKey]) groupesParBase[baseKey] = [];
+
+    let groupe = null;
+    for (let i = groupesParBase[baseKey].length - 1; i >= 0; i--) {
+      const candidat = groupesParBase[baseKey][i];
+      const ecartAvant = start.getTime() - candidat.finMax.getTime();
+      const ecartApres = candidat.debutMin.getTime() - end.getTime();
+      if (ecartAvant <= MAX_GROUPE_GAP_MS && ecartApres <= MAX_GROUPE_GAP_MS) {
+        groupe = candidat;
+        break;
+      }
+    }
+
+    if (!groupe) {
+      groupe = {
+        key: baseKey + "|" + start.getTime() + "|" + groupesParBase[baseKey].length,
         nom: nom,
         events: [],
         debutMin: start,
@@ -558,15 +579,25 @@ function regrouperEventsGlobal_(events) {
         isOption: isOption,
         phases: new Set()
       };
+      groupesParBase[baseKey].push(groupe);
     }
 
-    groupes[key].events.push(ev);
-    groupes[key].phases.add(phase);
-    if (start < groupes[key].debutMin) groupes[key].debutMin = start;
-    if (end > groupes[key].finMax) groupes[key].finMax = end;
+    groupe.events.push(ev);
+    groupe.phases.add(phase);
+    if (start < groupe.debutMin) groupe.debutMin = start;
+    if (end > groupe.finMax) groupe.finMax = end;
   });
 
-  return Object.values(groupes);
+  const resultat = Object.values(groupesParBase)
+    .reduce((acc, groupes) => acc.concat(groupes), [])
+    .sort((a, b) => a.debutMin - b.debutMin);
+
+  logDebug_(
+    "regrouperEventsGlobal_",
+    "events=" + events.length + ", groupes=" + resultat.length + ", bases=" + Object.keys(groupesParBase).length
+  );
+
+  return resultat;
 }
 
 function logDebug_(scope, message) {
@@ -580,27 +611,37 @@ function regrouperOccupationsEspaceParEvent_(items) {
   let typesManquants = 0;
 
   items.forEach(item => {
-    const key = String(item.event || "").trim();
+    const eventLabel = String(item.event || "").trim();
+    const key = String(
+      item.groupKey || ((item.isOption ? "OPTION|" : "STD|") + eventLabel)
+    ).trim();
     if (!key) return;
     if (!item.type) typesManquants += 1;
 
     if (!groupes[key]) {
       groupes[key] = {
+        groupKey: key,
         event: item.event,
         debut: item.debut,
         fin: item.fin,
         course: !!item.course,
         type: item.type || "",
+        isOption: !!item.isOption,
+        phases: new Set(normaliserPhases_(item.phases))
       };
     } else {
       if (item.debut < groupes[key].debut) groupes[key].debut = item.debut;
       if (item.fin > groupes[key].fin) groupes[key].fin = item.fin;
       if (item.course) groupes[key].course = true;
       if (!groupes[key].type && item.type) groupes[key].type = item.type;
+      if (item.isOption) groupes[key].isOption = true;
+      normaliserPhases_(item.phases).forEach(phase => groupes[key].phases.add(phase));
     }
   });
 
-  const resultat = Object.values(groupes).sort((a, b) => a.debut - b.debut);
+  const resultat = Object.values(groupes)
+    .map(item => Object.assign({}, item, { phases: normaliserPhases_(item.phases) }))
+    .sort((a, b) => a.debut - b.debut);
   logDebug_(
     "regrouperOccupationsEspaceParEvent_",
     "items=" + items.length + ", groupes=" + resultat.length + ", typesManquants=" + typesManquants
@@ -949,11 +990,14 @@ eventsGroupes.forEach(groupe => {
             groupe.espaces.add(nom);
             if (!recapEspaces[nom]) recapEspaces[nom] = [];
             recapEspaces[nom].push({
+              groupKey: groupe.key,
               event: groupe.nom,
               debut: groupe.debutMin,
               fin: groupe.finMax,
               course: reunion === "✓",
-              type: type
+              type: type,
+              isOption: isOption,
+              phases: normaliserPhases_(groupe.phases)
             });
           }
         });
@@ -1018,7 +1062,7 @@ Object.keys(recapEspaces)
     `;
 
     itemsGroupes.forEach(item => {
-      const isOption = detecterOptionEvent(item.event);
+      const isOption = !!item.isOption;
       const phase = getPhaseUnique_(item.phases);
       const phasesLibelle = libellerPhases_(item.phases);
 
