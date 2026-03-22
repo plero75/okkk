@@ -530,12 +530,14 @@ function regrouperOccupationsEspaceParEvent_(items) {
         event: item.event,
         debut: item.debut,
         fin: item.fin,
-        course: !!item.course
+        course: !!item.course,
+        type: item.type || "",
       };
     } else {
       if (item.debut < groupes[key].debut) groupes[key].debut = item.debut;
       if (item.fin > groupes[key].fin) groupes[key].fin = item.fin;
       if (item.course) groupes[key].course = true;
+      if (!groupes[key].type && item.type) groupes[key].type = item.type;
     }
   });
 
@@ -544,14 +546,15 @@ function regrouperOccupationsEspaceParEvent_(items) {
 
 function calculerDureeDepuisDates_(debut, fin) {
   const ms = fin - debut;
-  const jours = Math.round(ms / (1000 * 60 * 60 * 24));
+  const minutesTotal = Math.round(ms / (1000 * 60));
+  const jours = Math.floor(minutesTotal / (60 * 24));
 
   if (jours > 1) return jours + " jours";
   if (jours === 1) return "1 jour";
 
-  const h = Math.floor(ms / (1000 * 60 * 60));
-  const m = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-  return h + "h" + (m > 0 ? String(m).padStart(2, "0") : "00");
+  const heures = Math.floor(minutesTotal / 60);
+  const minutes = minutesTotal % 60;
+  return heures + "h" + String(minutes).padStart(2, "0");
 }
 
 function listerEventsCalendar_(calendarId, start, end, maxResults) {
@@ -572,6 +575,8 @@ function construireSetJoursCourses_(eventsCourses, H) {
     const e = new Date(ev.end.date || ev.end.dateTime);
     const sd = new Date(s.getFullYear(), s.getMonth(), s.getDate());
     const ed = new Date(e.getFullYear(), e.getMonth(), e.getDate());
+
+    if (ed < sd) return;
 
     for (let d = new Date(sd); d <= ed; d.setDate(d.getDate() + 1)) {
       joursCourses.add(H.getKeyDate(d));
