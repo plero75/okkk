@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
   <head>
     <base target="_top">
@@ -22,9 +22,7 @@
         --radius:20px;
       }
 
-      *{
-        box-sizing:border-box;
-      }
+      *{ box-sizing:border-box; }
 
       html, body{
         margin:0;
@@ -34,12 +32,10 @@
         color:var(--text);
       }
 
-      body{
-        padding:24px;
-      }
+      body{ padding:24px; }
 
       .page{
-        max-width:1200px;
+        max-width:1280px;
         margin:0 auto;
       }
 
@@ -77,19 +73,67 @@
         font-size:15px;
       }
 
+      .split{
+        display:grid;
+        grid-template-columns:430px 1fr;
+        gap:18px;
+        align-items:start;
+      }
+
       .card{
         background:var(--card);
         border:1px solid var(--line);
         border-radius:var(--radius);
         padding:22px;
         box-shadow:var(--shadow);
-        margin-bottom:18px;
       }
 
       .section-title{
-        margin:0 0 14px 0;
-        font-size:18px;
-        font-weight:700;
+        margin:0 0 8px 0;
+        font-size:20px;
+        font-weight:800;
+      }
+
+      .section-intro{
+        margin:0 0 18px 0;
+        color:var(--muted);
+        font-size:13px;
+        line-height:1.5;
+      }
+
+      .stack{
+        display:flex;
+        flex-direction:column;
+        gap:16px;
+      }
+
+      .subcard{
+        border:1px solid #edf1f6;
+        border-radius:18px;
+        background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);
+        padding:16px;
+      }
+
+      .subcard-title{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin:0 0 8px 0;
+        font-size:15px;
+        font-weight:800;
+      }
+
+      .subcard-step{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:24px;
+        height:24px;
+        border-radius:999px;
+        background:var(--accent-soft);
+        color:var(--accent-2);
+        font-size:12px;
+        font-weight:800;
       }
 
       .preset-title{
@@ -135,15 +179,8 @@
         gap:16px;
       }
 
-      .grid-3{
-        display:grid;
-        grid-template-columns:1fr 1fr 1fr;
-        gap:16px;
-      }
-
-      .row{
-        margin-bottom:16px;
-      }
+      .row{ margin-bottom:16px; }
+      .row:last-child{ margin-bottom:0; }
 
       label{
         display:block;
@@ -186,8 +223,36 @@
         margin-top:6px;
       }
 
-      .hidden{
-        display:none;
+      .hidden{ display:none; }
+
+      .summary{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+      }
+
+      .summary-item{
+        padding:12px;
+        border-radius:14px;
+        background:#f8fafc;
+        border:1px solid #e5e7eb;
+      }
+
+      .summary-label{
+        display:block;
+        font-size:11px;
+        font-weight:700;
+        color:var(--muted);
+        text-transform:uppercase;
+        letter-spacing:.04em;
+        margin-bottom:4px;
+      }
+
+      .summary-value{
+        font-size:13px;
+        font-weight:700;
+        color:var(--text);
+        line-height:1.35;
       }
 
       .buttons{
@@ -207,23 +272,23 @@
         transition:transform .15s ease, opacity .15s ease;
       }
 
-      button.action:hover{
-        transform:translateY(-1px);
+      button.action:hover{ transform:translateY(-1px); }
+      .btn-light{ background:#e5e7eb; color:#111827; }
+      .btn-dark{ background:var(--accent); color:#fff; }
+      .btn-blue{ background:#1d4ed8; color:#fff; }
+
+      .export-box{
+        padding:14px;
+        border:1px solid #e5e7eb;
+        border-radius:16px;
+        background:#fafcff;
+        margin-bottom:14px;
       }
 
-      .btn-light{
-        background:#e5e7eb;
-        color:#111827;
-      }
-
-      .btn-dark{
-        background:var(--accent);
-        color:#fff;
-      }
-
-      .btn-blue{
-        background:#1d4ed8;
-        color:#fff;
+      .export-title{
+        font-size:14px;
+        font-weight:800;
+        margin:0 0 12px 0;
       }
 
       .status{
@@ -231,7 +296,13 @@
         font-size:14px;
         color:#b45309;
         min-height:18px;
+        padding:10px 12px;
+        border-radius:12px;
+        background:#fff7ed;
+        border:1px solid #fed7aa;
       }
+
+      .status:empty{ display:none; }
 
       .subject-box{
         display:none;
@@ -245,37 +316,6 @@
       .subject-box strong{
         display:block;
         margin-bottom:4px;
-      }
-
-      .preview{
-        background:#fff;
-        border:1px solid var(--line);
-        border-radius:20px;
-        padding:12px;
-        height:480px;
-        overflow:auto;
-        box-shadow:0 8px 24px rgba(15,23,42,0.05);
-      }
-
-      .split{
-        display:grid;
-        grid-template-columns:420px 1fr;
-        gap:18px;
-        align-items:start;
-      }
-
-      .export-box{
-        margin-top:8px;
-        padding:14px;
-        border:1px solid #e5e7eb;
-        border-radius:16px;
-        background:#fafcff;
-      }
-
-      .export-title{
-        font-size:14px;
-        font-weight:700;
-        margin:0 0 12px 0;
       }
 
       .link-box{
@@ -296,13 +336,84 @@
         text-decoration:none;
       }
 
+      .preview-shell{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+      }
+
+      .preview-header{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:12px;
+        padding:18px;
+        border-radius:20px;
+        background:linear-gradient(135deg,#ffffff 0%,#f8fbff 100%);
+        border:1px solid #edf1f6;
+        box-shadow:var(--shadow);
+      }
+
+      .preview-title{
+        margin:0;
+        font-size:19px;
+        font-weight:800;
+      }
+
+      .preview-subtitle{
+        margin:6px 0 0 0;
+        color:var(--muted);
+        font-size:13px;
+        line-height:1.5;
+      }
+
+      .preview-meta{
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:flex-end;
+        gap:8px;
+      }
+
+      .chip{
+        display:inline-flex;
+        align-items:center;
+        padding:7px 10px;
+        border-radius:999px;
+        background:#eff6ff;
+        color:#1d4ed8;
+        font-size:12px;
+        font-weight:700;
+        border:1px solid #bfdbfe;
+      }
+
+      .preview{
+        background:#fff;
+        border:1px solid var(--line);
+        border-radius:20px;
+        padding:12px;
+        min-height:540px;
+        height:540px;
+        overflow:auto;
+        box-shadow:0 8px 24px rgba(15,23,42,0.05);
+      }
+
+      .empty-preview{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100%;
+        text-align:center;
+        color:var(--muted);
+        font-size:14px;
+        padding:24px;
+        line-height:1.6;
+      }
+
       @media (max-width: 980px){
-        .split{
-          grid-template-columns:1fr;
-        }
-        .grid, .grid-3{
-          grid-template-columns:1fr;
-        }
+        .split{ grid-template-columns:1fr; }
+        .grid, .summary{ grid-template-columns:1fr; }
+        .preview-header{ flex-direction:column; }
+        .preview-meta{ justify-content:flex-start; }
       }
     </style>
   </head>
@@ -317,92 +428,127 @@
       <div class="split">
         <div>
           <div class="card">
-            <div class="preset-title">Raccourcis de période</div>
-            <div class="preset-grid">
-              <button type="button" class="preset-btn" onclick="applyPreset('mois_en_cours', this)">Mois en cours</button>
-              <button type="button" class="preset-btn" onclick="applyPreset('mois_prochain', this)">Mois prochain</button>
-              <button type="button" class="preset-btn" onclick="applyPreset('annee_en_cours', this)">Année en cours</button>
-              <button type="button" class="preset-btn" onclick="applyPreset('reste_annee_en_cours', this)">Restant année en cours</button>
-              <button type="button" class="preset-btn" onclick="applyPreset('6_prochains_mois', this)">6 prochains mois</button>
-              <button type="button" class="preset-btn" onclick="applyPreset('25_prochains_evenements', this)">25 prochains événements</button>
-            </div>
+            <h2 class="section-title">Paramétrage</h2>
+            <div class="section-intro">Préparez votre période, choisissez le destinataire et vérifiez le résumé avant de lancer l’aperçu, l’envoi du mail ou l’export.</div>
 
-            <div class="grid">
-              <div class="row">
-                <label for="dateDebut">
-                  Date de début
-                  <span class="mode-badge" id="modeBadge">Mode manuel</span>
-                </label>
-                <input type="date" id="dateDebut">
-                <div class="small">Par défaut, la date du jour est proposée.</div>
+            <div class="stack">
+              <div class="subcard">
+                <div class="subcard-title"><span class="subcard-step">1</span> Période</div>
+                <div class="preset-title">Raccourcis de période</div>
+                <div class="preset-grid">
+                  <button type="button" class="preset-btn" onclick="applyPreset('mois_en_cours', this)">Mois en cours</button>
+                  <button type="button" class="preset-btn" onclick="applyPreset('mois_prochain', this)">Mois prochain</button>
+                  <button type="button" class="preset-btn" onclick="applyPreset('annee_en_cours', this)">Année en cours</button>
+                  <button type="button" class="preset-btn" onclick="applyPreset('reste_annee_en_cours', this)">Restant année en cours</button>
+                  <button type="button" class="preset-btn" onclick="applyPreset('6_prochains_mois', this)">6 prochains mois</button>
+                  <button type="button" class="preset-btn" onclick="applyPreset('25_prochains_evenements', this)">25 prochains événements</button>
+                </div>
+
+                <div class="grid">
+                  <div class="row">
+                    <label for="dateDebut">Date de début <span class="mode-badge" id="modeBadge">Mode manuel</span></label>
+                    <input type="date" id="dateDebut">
+                    <div class="small">Par défaut, la date du jour est proposée.</div>
+                  </div>
+                  <div class="row">
+                    <label for="dateFin">Date de fin</label>
+                    <input type="date" id="dateFin">
+                    <div class="small" id="dateFinHint">Choix manuel ou via les raccourcis ci-dessus.</div>
+                  </div>
+                </div>
               </div>
 
-              <div class="row">
-                <label for="dateFin">Date de fin</label>
-                <input type="date" id="dateFin">
-                <div class="small" id="dateFinHint">Choix manuel ou via les raccourcis ci-dessus.</div>
-              </div>
-            </div>
-
-            <div class="row">
-              <label for="emailChoisi">Destinataire</label>
-              <select id="emailChoisi" onchange="toggleCustomEmail()"></select>
-            </div>
-
-            <div class="row hidden" id="emailLibreWrapper">
-              <label for="emailLibre">Email personnalisé</label>
-              <input type="email" id="emailLibre" placeholder="nom@domaine.com">
-            </div>
-
-            <div class="export-box">
-              <div class="export-title">Export</div>
-
-              <div class="row">
-                <label for="typeExport">Contenu à exporter</label>
-                <select id="typeExport">
-                  <option value="mensuel">Récap mensuel</option>
-                  <option value="detail">Liste détaillée</option>
-                  <option value="espace">Récap par espace</option>
-                  <option value="responsable">Récap par responsable</option>
-                  <option value="onet">Récap ONET</option>
-                  <option value="cj">Récap CJ Sécurité</option>
-                  <option value="tech">Récap Technique</option>
-                </select>
+              <div class="subcard">
+                <div class="subcard-title"><span class="subcard-step">2</span> Destinataire</div>
+                <div class="row">
+                  <label for="emailChoisi">Destinataire</label>
+                  <select id="emailChoisi"></select>
+                </div>
+                <div class="row hidden" id="emailLibreWrapper">
+                  <label for="emailLibre">Email personnalisé</label>
+                  <input type="email" id="emailLibre" placeholder="nom@domaine.com">
+                </div>
               </div>
 
-              <div class="row">
-                <label for="formatExport">Format</label>
-                <select id="formatExport">
-                  <option value="pdf">PDF</option>
-                  <option value="excel">Excel</option>
-                </select>
+              <div class="subcard">
+                <div class="subcard-title"><span class="subcard-step">3</span> Sortie</div>
+                <div class="export-box">
+                  <div class="export-title">Export</div>
+                  <div class="row">
+                    <label for="typeExport">Contenu à exporter</label>
+                    <select id="typeExport">
+                      <option value="mensuel">Récap mensuel</option>
+                      <option value="detail">Liste détaillée</option>
+                      <option value="espace">Récap par espace</option>
+                      <option value="responsable">Récap par responsable</option>
+                      <option value="onet">Récap ONET</option>
+                      <option value="cj">Récap CJ Sécurité</option>
+                      <option value="tech">Récap Technique</option>
+                    </select>
+                  </div>
+                  <div class="row">
+                    <label for="formatExport">Format</label>
+                    <select id="formatExport">
+                      <option value="pdf">PDF</option>
+                      <option value="excel">Excel</option>
+                    </select>
+                  </div>
+                  <div class="buttons">
+                    <button class="action btn-blue" onclick="lancerExport()">Générer l’export</button>
+                  </div>
+                  <div class="link-box" id="exportLinkBox"></div>
+                </div>
+
+                <div class="summary">
+                  <div class="summary-item">
+                    <span class="summary-label">Mode</span>
+                    <span class="summary-value" id="summaryMode">Mode manuel</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Période</span>
+                    <span class="summary-value" id="summaryRange">À compléter</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Destinataire</span>
+                    <span class="summary-value" id="summaryRecipient">À compléter</span>
+                  </div>
+                  <div class="summary-item">
+                    <span class="summary-label">Sortie</span>
+                    <span class="summary-value" id="summaryExport">Récap mensuel • PDF</span>
+                  </div>
+                </div>
+
+                <div class="buttons" style="margin-top:18px;">
+                  <button class="action btn-light" onclick="genererPreview()">Prévisualiser</button>
+                  <button class="action btn-dark" onclick="envoyerMail()">Envoyer le mail</button>
+                  <button class="action btn-light" onclick="google.script.host.close()">Fermer</button>
+                </div>
+
+                <div class="status" id="status"></div>
+
+                <div class="subject-box" id="subjectBox">
+                  <strong>Objet</strong>
+                  <div id="subjectText"></div>
+                </div>
               </div>
-
-              <div class="buttons">
-                <button class="action btn-blue" onclick="lancerExport()">Générer l’export</button>
-              </div>
-
-              <div class="link-box" id="exportLinkBox"></div>
-            </div>
-
-            <div class="buttons" style="margin-top:18px;">
-              <button class="action btn-light" onclick="genererPreview()">Prévisualiser</button>
-              <button class="action btn-dark" onclick="envoyerMail()">Envoyer le mail</button>
-              <button class="action btn-light" onclick="google.script.host.close()">Fermer</button>
-            </div>
-
-            <div class="status" id="status"></div>
-
-            <div class="subject-box" id="subjectBox">
-              <strong>Objet</strong>
-              <div id="subjectText"></div>
             </div>
           </div>
         </div>
 
         <div>
-          <div class="preview" id="preview">
-            <em>Aucun aperçu pour le moment.</em>
+          <div class="preview-shell">
+            <div class="preview-header">
+              <div>
+                <h2 class="preview-title">Aperçu en direct</h2>
+                <p class="preview-subtitle">Visualisez le rendu généré avant envoi ou export. Les indicateurs de contexte à droite suivent automatiquement vos choix.</p>
+              </div>
+              <div class="preview-meta" id="previewMeta">
+                <span class="chip">Aucun aperçu</span>
+              </div>
+            </div>
+            <div class="preview" id="preview">
+              <div class="empty-preview">Aucun aperçu pour le moment.<br>Renseignez les champs puis cliquez sur <strong>Prévisualiser</strong>.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -422,9 +568,67 @@
         return `${yyyy}-${mm}-${dd}`;
       }
 
+      function formatDateDisplay(value) {
+        if (!value) return "À compléter";
+        const parts = value.split("-");
+        return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
+      }
+
+      function getModeLabel(mode) {
+        const labels = {
+          manuel: "Mode manuel",
+          mois_en_cours: "Mois en cours",
+          mois_prochain: "Mois prochain",
+          annee_en_cours: "Année en cours",
+          reste_annee_en_cours: "Restant année en cours",
+          "6_prochains_mois": "6 prochains mois",
+          "25_prochains_evenements": "25 prochains événements"
+        };
+        return labels[mode] || "Mode manuel";
+      }
+
+      function getSelectedText(id) {
+        const select = document.getElementById(id);
+        if (!select || select.selectedIndex < 0) return "";
+        return select.options[select.selectedIndex].textContent;
+      }
+
+      function updatePreviewMeta(items) {
+        const meta = document.getElementById("previewMeta");
+        meta.innerHTML = "";
+        items.forEach(text => {
+          const chip = document.createElement("span");
+          chip.className = "chip";
+          chip.textContent = text;
+          meta.appendChild(chip);
+        });
+      }
+
+      function updateFormSummary() {
+        const modeLabel = getModeLabel(currentMode);
+        const start = document.getElementById("dateDebut").value;
+        const end = document.getElementById("dateFin").value;
+        const emailSelect = document.getElementById("emailChoisi");
+        const recipient = emailSelect && emailSelect.value === "__custom__"
+          ? (document.getElementById("emailLibre").value || "Email personnalisé")
+          : getSelectedText("emailChoisi").replace(/\s*\(.+\)\s*$/, "");
+        const exportText = `${getSelectedText("typeExport")} • ${getSelectedText("formatExport")}`;
+        const rangeText = currentMode === "25_prochains_evenements"
+          ? `À partir du ${formatDateDisplay(start)}`
+          : `${formatDateDisplay(start)} → ${formatDateDisplay(end)}`;
+
+        document.getElementById("summaryMode").textContent = modeLabel;
+        document.getElementById("summaryRange").textContent = rangeText;
+        document.getElementById("summaryRecipient").textContent = recipient || "À compléter";
+        document.getElementById("summaryExport").textContent = exportText;
+
+        updatePreviewMeta([modeLabel, exportText, rangeText]);
+      }
+
       function toggleCustomEmail() {
         const value = document.getElementById("emailChoisi").value;
         document.getElementById("emailLibreWrapper").classList.toggle("hidden", value !== "__custom__");
+        updateFormSummary();
       }
 
       function clearPresetButtons() {
@@ -444,42 +648,38 @@
           start = new Date(today.getFullYear(), today.getMonth(), 1);
           end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
         }
-
         if (mode === "mois_prochain") {
           start = new Date(today.getFullYear(), today.getMonth() + 1, 1);
           end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
         }
-
         if (mode === "annee_en_cours") {
           start = new Date(today.getFullYear(), 0, 1);
           end = new Date(today.getFullYear(), 11, 31);
         }
-
         if (mode === "reste_annee_en_cours") {
           start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
           end = new Date(today.getFullYear(), 11, 31);
         }
-
         if (mode === "6_prochains_mois") {
           start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
           end = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
         }
-
         if (mode === "25_prochains_evenements") {
           document.getElementById("dateDebut").value = formatDateInput(today);
           document.getElementById("dateFin").value = "";
           document.getElementById("dateFin").disabled = true;
           document.getElementById("dateFinHint").textContent = "La date de fin n’est pas utilisée dans ce mode.";
           document.getElementById("modeBadge").textContent = "25 prochains événements";
+          updateFormSummary();
           return;
         }
 
         document.getElementById("dateFin").disabled = false;
         document.getElementById("dateFinHint").textContent = "Choix manuel ou via les raccourcis ci-dessus.";
         document.getElementById("modeBadge").textContent = "Mode automatique";
-
         if (start) document.getElementById("dateDebut").value = formatDateInput(start);
         if (end) document.getElementById("dateFin").value = formatDateInput(end);
+        updateFormSummary();
       }
 
       function collectForm() {
@@ -493,38 +693,38 @@
           formatExport: document.getElementById("formatExport").value
         };
 
-        if (!form.dateDebut) {
-          throw new Error("Merci de saisir une date de début.");
-        }
-
-        if (form.mode !== "25_prochains_evenements" && !form.dateFin) {
-          throw new Error("Merci de saisir une date de fin.");
-        }
-
+        if (!form.dateDebut) throw new Error("Merci de saisir une date de début.");
+        if (form.mode !== "25_prochains_evenements" && !form.dateFin) throw new Error("Merci de saisir une date de fin.");
         return form;
       }
 
-     function initForm(data){
-    const select = document.getElementById("emailChoisi");
-    select.innerHTML = "";
+      function initForm(data){
+        const select = document.getElementById("emailChoisi");
+        select.innerHTML = "";
 
-    const emails = [
-      { label: "Jad Zoghbi", value: "jad.zoghbi@letrot.com" },
-      { label: "Paul Lerosier", value: "ext.paul.lerosier@letrot.com" },
-      { label: "Email personnalisé", value: "_custom_" }
-    ];
+        const defaults = (data && Array.isArray(data.emailOptions) ? data.emailOptions : null) || [
+          { label: "Jad Zoghbi", value: "jad.zoghbi@letrot.com" },
+          { label: "Paul Lerosier", value: "ext.paul.lerosier@letrot.com" }
+        ];
 
-    emails.forEach(item => {
-      const option = document.createElement("option");
-      option.value = item.value;
-      option.textContent = item.label + " (" + item.value + ")";
-      select.appendChild(option);
-    });
+        defaults.forEach(item => {
+          const option = document.createElement("option");
+          option.value = item.value;
+          option.textContent = `${item.label} (${item.value})`;
+          select.appendChild(option);
+        });
 
-    toggleCustomEmail();
-  }
+        const customOption = document.createElement("option");
+        customOption.value = "__custom__";
+        customOption.textContent = "Email personnalisé";
+        select.appendChild(customOption);
 
-  initForm();
+        if (data && data.emailDefaut) select.value = data.emailDefaut;
+
+        document.getElementById("dateDebut").value = document.getElementById("dateDebut").value || formatDateInput(new Date());
+        toggleCustomEmail();
+        updateFormSummary();
+      }
 
       function genererPreview() {
         let form;
@@ -536,12 +736,12 @@
         }
 
         setStatus("Génération de l’aperçu…");
-
         google.script.run
           .withSuccessHandler(function(payload) {
             document.getElementById("preview").innerHTML = payload.htmlBody;
             document.getElementById("subjectText").textContent = payload.subject;
             document.getElementById("subjectBox").style.display = "block";
+            updatePreviewMeta(["Aperçu généré", getModeLabel(currentMode), document.getElementById("summaryExport").textContent]);
             setStatus("Aperçu généré.");
           })
           .withFailureHandler(function(err) {
@@ -560,7 +760,6 @@
         }
 
         setStatus("Envoi du mail…");
-
         google.script.run
           .withSuccessHandler(function(message) {
             setStatus(message);
@@ -581,7 +780,6 @@
         }
 
         setStatus("Génération de l’export…");
-
         google.script.run
           .withSuccessHandler(function(url) {
             const box = document.getElementById("exportLinkBox");
@@ -595,6 +793,12 @@
           .lancerExport(form);
       }
 
+      ["dateDebut", "dateFin", "emailLibre", "typeExport", "formatExport"].forEach(id => {
+        document.getElementById(id).addEventListener("input", updateFormSummary);
+        document.getElementById(id).addEventListener("change", updateFormSummary);
+      });
+      document.getElementById("emailChoisi").addEventListener("change", toggleCustomEmail);
+
       google.script.run
         .withSuccessHandler(function(data) {
           initForm(data);
@@ -607,4 +811,3 @@
     </script>
   </body>
 </html>
- 
