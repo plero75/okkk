@@ -911,7 +911,8 @@ eventsGroupes.forEach(groupe => {
               event: groupe.nom,
               debut: groupe.debutMin,
               fin: groupe.finMax,
-              course: reunion === "✓"
+              course: reunion === "✓",
+              type: type
             });
           }
         });
