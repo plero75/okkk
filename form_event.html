@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 12px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    input, select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      margin-bottom: 4px;
+    }
+    .spaces, .bloc {
+      border: 1px solid #ddd;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+    }
+    .spaces {
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    .space-item, .inline-check {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: normal;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: #1a73e8;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+    .msg {
+      margin-top: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+    .ok { background: #e6f4ea; }
+    .err { background: #fce8e6; }
+    .warn { background: #fff4e5; }
+    h4 {
+      margin: 0 0 8px 0;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h3>Nouvel événement</h3>
+
+  <label>Site</label>
+  <select id="site" onchange="loadSpaces()">
+    <option value="ENGHIEN">Enghien</option>
+    <option value="VINCENNES">Vincennes</option>
+  </select>
+
+  <label>Titre</label>
+  <input type="text" id="title">
+
+  <label>Début</label>
+  <input type="datetime-local" id="start">
+
+  <label>Fin</label>
+  <input type="datetime-local" id="end">
+
+  <label>Responsable</label>
+  <input type="text" id="manager">
+
+  <label>Type</label>
+  <select id="type">
+    <option value="B2B">B2B</option>
+    <option value="B2C">B2C</option>
+  </select>
+
+  <label>PAX</label>
+  <input type="number" id="pax">
+
+  <label>Espaces</label>
+  <div id="spaces" class="spaces"></div>
+
+  <div class="bloc">
+    <h4>Visite guidée</h4>
+    <label class="inline-check">
+      <input type="checkbox" id="visiteGuidee" onchange="toggleVisiteGuidee()"> Oui
+    </label>
+
+    <div id="visiteGuideeFields" class="hidden">
+      <label>Date visite guidée</label>
+      <input type="date" id="visiteDate">
+
+      <label>Heure visite guidée</label>
+      <input type="time" id="visiteHeure">
+
+      <label>Nb de pax visite guidée</label>
+      <input type="number" id="visitePax">
+    </div>
+  </div>
+
+  <div class="bloc">
+    <h4>PMU</h4>
+    <label class="inline-check">
+      <input type="checkbox" id="pmuBorne"> Mise en marche de borne
+    </label>
+    <label class="inline-check">
+      <input type="checkbox" id="pmuBonApartir"> Bon à partir
+    </label>
+    <label class="inline-check">
+      <input type="checkbox" id="pmuInitiation"> Initiation aux paris
+    </label>
+  </div>
+
+  <label>Notes</label>
+  <textarea id="notes" rows="5"></textarea>
+
+  <button onclick="submitForm()">Créer l’événement</button>
+
+  <div id="message" class="msg" style="display:none;"></div>
+
+  <script>
+    function showMessage(text, cls) {
+      const el = document.getElementById('message');
+      el.style.display = 'block';
+      el.className = 'msg ' + cls;
+      el.textContent = text;
+    }
+
+    function toggleVisiteGuidee() {
+      const checked = document.getElementById('visiteGuidee').checked;
+      document.getElementById('visiteGuideeFields').classList.toggle('hidden', !checked);
+    }
+
+    function loadSpaces() {
+      const site = document.getElementById('site').value;
+      google.script.run.withSuccessHandler(function(spaces) {
+        const container = document.getElementById('spaces');
+        container.innerHTML = '';
+
+        (spaces || []).forEach(function(space, idx) {
+          const label = document.createElement('label');
+          label.className = 'space-item';
+
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = space;
+          cb.id = 'space_' + idx;
+
+          label.appendChild(cb);
+          label.appendChild(document.createTextNode(' ' + space));
+          container.appendChild(label);
+        });
+      }).getSpacesForForm_(site);
+    }
+
+    function getSelectedSpaces() {
+      const cbs = document.querySelectorAll('#spaces input[type="checkbox"]:checked');
+      return Array.from(cbs).map(cb => cb.value);
+    }
+
+    function createEventFromForm(data) {
+  const siteKey = data.site;
+  const cfg = getSiteConfig_(siteKey);
+
+  const calendarId = cfg.calendarEvents;
+  const cal = CalendarApp.getCalendarById(calendarId);
+  if (!cal) {
+    throw new Error("Agenda événements introuvable pour " + cfg.label);
+  }
+
+  const start = new Date(data.start);
+  const end = new Date(data.end);
+
+  const lignes = [
+    "Responsable: " + (data.manager || ""),
+    "Type: " + (data.type || "B2C"),
+    "PAX: " + (data.pax || ""),
+    "Espaces: " + ((data.spaces || []).join(", "))
+  ];
+
+  if (data.visiteGuidee) {
+    lignes.push("Visite guidée: OUI");
+    lignes.push("Visite guidée - Date: " + (data.visiteDate || ""));
+    lignes.push("Visite guidée - Heure: " + (data.visiteHeure || ""));
+    lignes.push("Visite guidée - PAX: " + (data.visitePax || ""));
+  } else {
+    lignes.push("Visite guidée: NON");
+  }
+
+  lignes.push("PMU - Mise en marche borne: " + (data.pmuBorne ? "OUI" : "NON"));
+  lignes.push("PMU - Bon à partir: " + (data.pmuBonApartir ? "OUI" : "NON"));
+  lignes.push("PMU - Initiation aux paris: " + (data.pmuInitiation ? "OUI" : "NON"));
+
+  if (data.notes) {
+    lignes.push("");
+    lignes.push(data.notes);
+  }
+
+  const description = lignes.join("\n");
+
+  cal.createEvent(
+    data.title,
+    start,
+    end,
+    {
+      description: description
+    }
+  );
+
+  synchroniserCalendriersVersFeuille(siteKey);
+
+  return {
+    ok: true,
+    message: "Événement créé sur " + cfg.label
+  };
+}
+
+    loadSpaces();
+    toggleVisiteGuidee();
+  </script>
+</body>
+</html>

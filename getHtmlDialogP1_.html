@@ -1,0 +1,610 @@
+ <!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Récap Vincennes</title>
+    <style>
+      :root{
+        --bg:#f3f6fb;
+        --card:#ffffff;
+        --line:#e5e7eb;
+        --text:#111827;
+        --muted:#6b7280;
+        --accent:#0f172a;
+        --accent-2:#1d4ed8;
+        --accent-soft:#dbeafe;
+        --accent-border:#93c5fd;
+        --orange-soft:#fff7ed;
+        --orange:#c2410c;
+        --shadow:0 10px 30px rgba(15,23,42,0.07);
+        --radius:20px;
+      }
+
+      *{
+        box-sizing:border-box;
+      }
+
+      html, body{
+        margin:0;
+        padding:0;
+        font-family:Arial, sans-serif;
+        background:var(--bg);
+        color:var(--text);
+      }
+
+      body{
+        padding:24px;
+      }
+
+      .page{
+        max-width:1200px;
+        margin:0 auto;
+      }
+
+      .hero{
+        background:linear-gradient(135deg,#ffffff 0%,#f8fbff 60%,#fffaf5 100%);
+        border:1px solid #edf1f6;
+        border-radius:24px;
+        padding:24px 24px 18px 24px;
+        box-shadow:var(--shadow);
+        margin-bottom:18px;
+      }
+
+      .hero-badge{
+        display:inline-block;
+        margin-bottom:12px;
+        padding:7px 12px;
+        border-radius:999px;
+        font-size:12px;
+        font-weight:700;
+        background:var(--orange-soft);
+        color:var(--orange);
+        border:1px solid #fed7aa;
+      }
+
+      h1{
+        margin:0;
+        font-size:30px;
+        line-height:1.1;
+        letter-spacing:-0.4px;
+      }
+
+      .hero-sub{
+        margin-top:10px;
+        color:var(--muted);
+        font-size:15px;
+      }
+
+      .card{
+        background:var(--card);
+        border:1px solid var(--line);
+        border-radius:var(--radius);
+        padding:22px;
+        box-shadow:var(--shadow);
+        margin-bottom:18px;
+      }
+
+      .section-title{
+        margin:0 0 14px 0;
+        font-size:18px;
+        font-weight:700;
+      }
+
+      .preset-title{
+        font-size:13px;
+        font-weight:700;
+        color:var(--muted);
+        margin-bottom:10px;
+      }
+
+      .preset-grid{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-bottom:18px;
+      }
+
+      .preset-btn{
+        border:1px solid #dbe3ee;
+        background:#fff;
+        color:#0f172a;
+        border-radius:999px;
+        padding:10px 14px;
+        font-size:13px;
+        font-weight:700;
+        cursor:pointer;
+        transition:all .15s ease;
+      }
+
+      .preset-btn:hover{
+        background:#f8fafc;
+        transform:translateY(-1px);
+      }
+
+      .preset-btn.active{
+        background:var(--accent-soft);
+        border-color:var(--accent-border);
+        color:var(--accent-2);
+      }
+
+      .grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:16px;
+      }
+
+      .grid-3{
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr;
+        gap:16px;
+      }
+
+      .row{
+        margin-bottom:16px;
+      }
+
+      label{
+        display:block;
+        font-weight:700;
+        margin-bottom:7px;
+        font-size:14px;
+      }
+
+      .mode-badge{
+        display:inline-block;
+        margin-left:8px;
+        padding:4px 8px;
+        border-radius:999px;
+        font-size:11px;
+        font-weight:700;
+        background:#f3f4f6;
+        color:#374151;
+        vertical-align:middle;
+      }
+
+      input, select{
+        width:100%;
+        padding:12px 14px;
+        border:1px solid #d1d5db;
+        border-radius:12px;
+        font-size:14px;
+        background:#fff;
+        color:var(--text);
+      }
+
+      input:focus, select:focus{
+        outline:none;
+        border-color:#93c5fd;
+        box-shadow:0 0 0 4px rgba(59,130,246,0.12);
+      }
+
+      .small{
+        color:var(--muted);
+        font-size:12px;
+        margin-top:6px;
+      }
+
+      .hidden{
+        display:none;
+      }
+
+      .buttons{
+        display:flex;
+        gap:12px;
+        flex-wrap:wrap;
+        margin-top:6px;
+      }
+
+      button.action{
+        border:0;
+        border-radius:12px;
+        padding:12px 18px;
+        font-size:14px;
+        font-weight:700;
+        cursor:pointer;
+        transition:transform .15s ease, opacity .15s ease;
+      }
+
+      button.action:hover{
+        transform:translateY(-1px);
+      }
+
+      .btn-light{
+        background:#e5e7eb;
+        color:#111827;
+      }
+
+      .btn-dark{
+        background:var(--accent);
+        color:#fff;
+      }
+
+      .btn-blue{
+        background:#1d4ed8;
+        color:#fff;
+      }
+
+      .status{
+        margin-top:14px;
+        font-size:14px;
+        color:#b45309;
+        min-height:18px;
+      }
+
+      .subject-box{
+        display:none;
+        background:#f9fafb;
+        border:1px solid var(--line);
+        border-radius:14px;
+        padding:14px;
+        margin-top:14px;
+      }
+
+      .subject-box strong{
+        display:block;
+        margin-bottom:4px;
+      }
+
+      .preview{
+        background:#fff;
+        border:1px solid var(--line);
+        border-radius:20px;
+        padding:12px;
+        height:480px;
+        overflow:auto;
+        box-shadow:0 8px 24px rgba(15,23,42,0.05);
+      }
+
+      .split{
+        display:grid;
+        grid-template-columns:420px 1fr;
+        gap:18px;
+        align-items:start;
+      }
+
+      .export-box{
+        margin-top:8px;
+        padding:14px;
+        border:1px solid #e5e7eb;
+        border-radius:16px;
+        background:#fafcff;
+      }
+
+      .export-title{
+        font-size:14px;
+        font-weight:700;
+        margin:0 0 12px 0;
+      }
+
+      .link-box{
+        display:none;
+        margin-top:14px;
+        padding:12px 14px;
+        border-radius:14px;
+        background:#f0f9ff;
+        border:1px solid #bae6fd;
+        color:#0c4a6e;
+        font-size:14px;
+        word-break:break-word;
+      }
+
+      .link-box a{
+        color:#0369a1;
+        font-weight:700;
+        text-decoration:none;
+      }
+
+      @media (max-width: 980px){
+        .split{
+          grid-template-columns:1fr;
+        }
+        .grid, .grid-3{
+          grid-template-columns:1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="hero">
+        <div class="hero-badge">Hippodrome Paris-Vincennes</div>
+        <h1>Récap Vincennes</h1>
+        <div class="hero-sub">Prévisualisation, envoi mail et export de rapports</div>
+      </div>
+
+      <div class="split">
+        <div>
+          <div class="card">
+            <div class="preset-title">Raccourcis de période</div>
+            <div class="preset-grid">
+              <button type="button" class="preset-btn" onclick="applyPreset('mois_en_cours', this)">Mois en cours</button>
+              <button type="button" class="preset-btn" onclick="applyPreset('mois_prochain', this)">Mois prochain</button>
+              <button type="button" class="preset-btn" onclick="applyPreset('annee_en_cours', this)">Année en cours</button>
+              <button type="button" class="preset-btn" onclick="applyPreset('reste_annee_en_cours', this)">Restant année en cours</button>
+              <button type="button" class="preset-btn" onclick="applyPreset('6_prochains_mois', this)">6 prochains mois</button>
+              <button type="button" class="preset-btn" onclick="applyPreset('25_prochains_evenements', this)">25 prochains événements</button>
+            </div>
+
+            <div class="grid">
+              <div class="row">
+                <label for="dateDebut">
+                  Date de début
+                  <span class="mode-badge" id="modeBadge">Mode manuel</span>
+                </label>
+                <input type="date" id="dateDebut">
+                <div class="small">Par défaut, la date du jour est proposée.</div>
+              </div>
+
+              <div class="row">
+                <label for="dateFin">Date de fin</label>
+                <input type="date" id="dateFin">
+                <div class="small" id="dateFinHint">Choix manuel ou via les raccourcis ci-dessus.</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <label for="emailChoisi">Destinataire</label>
+              <select id="emailChoisi" onchange="toggleCustomEmail()"></select>
+            </div>
+
+            <div class="row hidden" id="emailLibreWrapper">
+              <label for="emailLibre">Email personnalisé</label>
+              <input type="email" id="emailLibre" placeholder="nom@domaine.com">
+            </div>
+
+            <div class="export-box">
+              <div class="export-title">Export</div>
+
+              <div class="row">
+                <label for="typeExport">Contenu à exporter</label>
+                <select id="typeExport">
+                  <option value="mensuel">Récap mensuel</option>
+                  <option value="detail">Liste détaillée</option>
+                  <option value="espace">Récap par espace</option>
+                  <option value="responsable">Récap par responsable</option>
+                  <option value="onet">Récap ONET</option>
+                  <option value="cj">Récap CJ Sécurité</option>
+                  <option value="tech">Récap Technique</option>
+                </select>
+              </div>
+
+              <div class="row">
+                <label for="formatExport">Format</label>
+                <select id="formatExport">
+                  <option value="pdf">PDF</option>
+                  <option value="excel">Excel</option>
+                </select>
+              </div>
+
+              <div class="buttons">
+                <button class="action btn-blue" onclick="lancerExport()">Générer l’export</button>
+              </div>
+
+              <div class="link-box" id="exportLinkBox"></div>
+            </div>
+
+            <div class="buttons" style="margin-top:18px;">
+              <button class="action btn-light" onclick="genererPreview()">Prévisualiser</button>
+              <button class="action btn-dark" onclick="envoyerMail()">Envoyer le mail</button>
+              <button class="action btn-light" onclick="google.script.host.close()">Fermer</button>
+            </div>
+
+            <div class="status" id="status"></div>
+
+            <div class="subject-box" id="subjectBox">
+              <strong>Objet</strong>
+              <div id="subjectText"></div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="preview" id="preview">
+            <em>Aucun aperçu pour le moment.</em>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let currentMode = "manuel";
+
+      function setStatus(message) {
+        document.getElementById("status").textContent = message || "";
+      }
+
+      function formatDateInput(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
+      }
+
+      function toggleCustomEmail() {
+        const value = document.getElementById("emailChoisi").value;
+        document.getElementById("emailLibreWrapper").classList.toggle("hidden", value !== "__custom__");
+      }
+
+      function clearPresetButtons() {
+        document.querySelectorAll(".preset-btn").forEach(btn => btn.classList.remove("active"));
+      }
+
+      function applyPreset(mode, btn) {
+        currentMode = mode;
+        clearPresetButtons();
+        if (btn) btn.classList.add("active");
+
+        const today = new Date();
+        let start = null;
+        let end = null;
+
+        if (mode === "mois_en_cours") {
+          start = new Date(today.getFullYear(), today.getMonth(), 1);
+          end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        }
+
+        if (mode === "mois_prochain") {
+          start = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+          end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+        }
+
+        if (mode === "annee_en_cours") {
+          start = new Date(today.getFullYear(), 0, 1);
+          end = new Date(today.getFullYear(), 11, 31);
+        }
+
+        if (mode === "reste_annee_en_cours") {
+          start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          end = new Date(today.getFullYear(), 11, 31);
+        }
+
+        if (mode === "6_prochains_mois") {
+          start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          end = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
+        }
+
+        if (mode === "25_prochains_evenements") {
+          document.getElementById("dateDebut").value = formatDateInput(today);
+          document.getElementById("dateFin").value = "";
+          document.getElementById("dateFin").disabled = true;
+          document.getElementById("dateFinHint").textContent = "La date de fin n’est pas utilisée dans ce mode.";
+          document.getElementById("modeBadge").textContent = "25 prochains événements";
+          return;
+        }
+
+        document.getElementById("dateFin").disabled = false;
+        document.getElementById("dateFinHint").textContent = "Choix manuel ou via les raccourcis ci-dessus.";
+        document.getElementById("modeBadge").textContent = "Mode automatique";
+
+        if (start) document.getElementById("dateDebut").value = formatDateInput(start);
+        if (end) document.getElementById("dateFin").value = formatDateInput(end);
+      }
+
+      function collectForm() {
+        const form = {
+          mode: currentMode,
+          dateDebut: document.getElementById("dateDebut").value,
+          dateFin: document.getElementById("dateFin").value,
+          emailChoisi: document.getElementById("emailChoisi").value,
+          emailLibre: document.getElementById("emailLibre").value,
+          typeExport: document.getElementById("typeExport").value,
+          formatExport: document.getElementById("formatExport").value
+        };
+
+        if (!form.dateDebut) {
+          throw new Error("Merci de saisir une date de début.");
+        }
+
+        if (form.mode !== "25_prochains_evenements" && !form.dateFin) {
+          throw new Error("Merci de saisir une date de fin.");
+        }
+
+        return form;
+      }
+
+     function initForm(data){
+    const select = document.getElementById("emailChoisi");
+    select.innerHTML = "";
+
+    const emails = [
+      { label: "Jad Zoghbi", value: "jad.zoghbi@letrot.com" },
+      { label: "Paul Lerosier", value: "ext.paul.lerosier@letrot.com" },
+      { label: "Email personnalisé", value: "_custom_" }
+    ];
+
+    emails.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.value;
+      option.textContent = item.label + " (" + item.value + ")";
+      select.appendChild(option);
+    });
+
+    toggleCustomEmail();
+  }
+
+  initForm();
+
+      function genererPreview() {
+        let form;
+        try {
+          form = collectForm();
+        } catch(e) {
+          setStatus(e.message);
+          return;
+        }
+
+        setStatus("Génération de l’aperçu…");
+
+        google.script.run
+          .withSuccessHandler(function(payload) {
+            document.getElementById("preview").innerHTML = payload.htmlBody;
+            document.getElementById("subjectText").textContent = payload.subject;
+            document.getElementById("subjectBox").style.display = "block";
+            setStatus("Aperçu généré.");
+          })
+          .withFailureHandler(function(err) {
+            setStatus("Erreur : " + err.message);
+          })
+          .genererApercuRecapVincennesP1(form);
+      }
+
+      function envoyerMail() {
+        let form;
+        try {
+          form = collectForm();
+        } catch(e) {
+          setStatus(e.message);
+          return;
+        }
+
+        setStatus("Envoi du mail…");
+
+        google.script.run
+          .withSuccessHandler(function(message) {
+            setStatus(message);
+          })
+          .withFailureHandler(function(err) {
+            setStatus("Erreur : " + err.message);
+          })
+          .envoyerRecapVincennesP1(form);
+      }
+
+      function lancerExport() {
+        let form;
+        try {
+          form = collectForm();
+        } catch(e) {
+          setStatus(e.message);
+          return;
+        }
+
+        setStatus("Génération de l’export…");
+
+        google.script.run
+          .withSuccessHandler(function(url) {
+            const box = document.getElementById("exportLinkBox");
+            box.style.display = "block";
+            box.innerHTML = `Export généré : <a href="${url}" target="_blank">ouvrir le fichier</a>`;
+            setStatus("Export généré.");
+          })
+          .withFailureHandler(function(err) {
+            setStatus("Erreur export : " + err.message);
+          })
+          .lancerExport(form);
+      }
+
+      google.script.run
+        .withSuccessHandler(function(data) {
+          initForm(data);
+        })
+        .withFailureHandler(function() {
+          setStatus("Erreur chargement destinataires, utilisation de la liste par défaut.");
+          initForm(null);
+        })
+        .getDialogDefaultsP1_();
+    </script>
+  </body>
+</html>
+ 
