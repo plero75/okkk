@@ -1,7 +1,8 @@
-/************************************************************
+﻿/************************************************************
  * EXPORTS VINCENNES
  ************************************************************/
 function lancerExport(form) {
+  const siteKey = normalizeRecapSiteKey_(form && form.siteKey);
   const start = parserDateISO_P1_(form.dateDebut, false);
   if (!start) throw new Error("Merci de saisir une date de début valide.");
 
@@ -18,7 +19,7 @@ function lancerExport(form) {
   const typeExport = String(form.typeExport || "detail");
   const formatExport = String(form.formatExport || "pdf");
 
-  const payload = construireDonneesExportVincennes_(start, end, typeExport, form);
+  const payload = construireDonneesExportSite_(siteKey, start, end, typeExport, form);
 
   if (formatExport === "pdf") {
     return exporterHtmlEnPdf_(payload.title, payload.html);
@@ -31,11 +32,12 @@ function lancerExport(form) {
   throw new Error("Format d'export non reconnu.");
 }
 
-function construireDonneesExportVincennes_(start, end, typeExport, form) {
+function construireContexteRecapSite_(siteKey, start, end) {
+  const recapSite = getRecapSiteConfigP1_(siteKey);
   const H = recapHelpersVincennesP1_();
 
   const events = listerEventsCalendar_(
-    RECAP_VINCENNES_CFG_P1.calendarEvents,
+    recapSite.calendarEvents,
     start,
     end,
     2500
@@ -46,50 +48,87 @@ function construireDonneesExportVincennes_(start, end, typeExport, form) {
   );
 
   const eventsCourses = listerEventsCalendar_(
-    RECAP_VINCENNES_CFG_P1.calendarCourses,
+    recapSite.calendarCourses,
     start,
     end,
     2500
   );
 
-  const joursCourses = construireSetJoursCourses_(eventsCourses, H);
-  const eventsGroupes = regrouperEventsGlobal_(events);
+  return {
+    siteKey: recapSite.siteKey,
+    siteLabel: recapSite.siteLabel,
+    siteFullLabel: recapSite.siteFullLabel,
+    H: H,
+    start: start,
+    end: end,
+    events: events,
+    eventsCourses: eventsCourses,
+    joursCourses: construireSetJoursCourses_(eventsCourses, H),
+    eventsGroupes: regrouperEventsGlobal_(events),
+    dateDebutTxt: H.formaterDateLongue(start),
+    dateFinTxt: H.formaterDateLongue(end)
+  };
+}
 
-  const dateDebutTxt = H.formaterDateLongue(start);
-  const dateFinTxt = H.formaterDateLongue(end);
+function construireContexteRecapVincennes_(start, end) {
+  return construireContexteRecapSite_("VINCENNES", start, end);
+}
+
+function construireDonneesExportSite_(siteKey, start, end, typeExport, form) {
+  const context = construireContexteRecapSite_(siteKey, start, end);
+  return construireDonneesExportSiteDepuisContexte_(context, typeExport, form);
+}
+
+function construireDonneesExportVincennes_(start, end, typeExport, form) {
+  return construireDonneesExportSite_("VINCENNES", start, end, typeExport, form);
+}
+
+function construireDonneesExportSiteDepuisContexte_(context, typeExport, form) {
+  const H = context.H;
+  const eventsGroupes = context.eventsGroupes;
+  const joursCourses = context.joursCourses;
+  const start = context.start;
+  const end = context.end;
+  const dateDebutTxt = context.dateDebutTxt;
+  const dateFinTxt = context.dateFinTxt;
+  const siteLabel = context.siteLabel;
 
   switch (typeExport) {
     case "mensuel":
-      return construireExportMensuel_(eventsGroupes, joursCourses, start, end, H, dateDebutTxt, dateFinTxt);
+      return construireExportMensuel_(eventsGroupes, joursCourses, start, end, H, dateDebutTxt, dateFinTxt, siteLabel);
 
     case "detail":
-      return construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt);
+      return construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, siteLabel);
 
     case "espace":
-      return construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt);
+      return construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, siteLabel);
 
     case "responsable":
-      return construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt);
+      return construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, siteLabel);
 
     case "onet":
-      return construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, "ONET");
+      return construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, "ONET", siteLabel);
 
     case "cj":
-      return construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, "CJ");
+      return construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, "CJ", siteLabel);
 
     case "tech":
-      return construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, "TECH");
+      return construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, "TECH", siteLabel);
 
     default:
       throw new Error("Type d'export non reconnu.");
   }
 }
 
+function construireDonneesExportVincennesDepuisContexte_(context, typeExport, form) {
+  return construireDonneesExportSiteDepuisContexte_(context, typeExport, form);
+}
+
 /************************************************************
  * BUILDERS EXPORT
  ************************************************************/
-function construireExportMensuel_(eventsGroupes, joursCourses, start, end, H, dateDebutTxt, dateFinTxt) {
-  const title = `Export - Récap mensuel Vincennes - ${dateDebutTxt} au ${dateFinTxt}`;
+function construireExportMensuel_(eventsGroupes, joursCourses, start, end, H, dateDebutTxt, dateFinTxt, siteLabel) {
+  const title = `Export - Récap mensuel ${siteLabel} - ${dateDebutTxt} au ${dateFinTxt}`;
   const rows = [[
     "Mois",
     "Date début",
@@ -112,8 +151,8 @@ function construireExportMensuel_(eventsGroupes, joursCourses, start, end, H, da
       const evRef = groupe.events[0];
       const type = H.detecterType(evRef);
       const phase = libellerPhasesGroupe_(groupe);
-      const isOption = groupe.isOption ? "Oui" : "";
-      const toucheCourse = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
+const isOption = groupe.isOption ? "Oui" : "";
+const toucheCourse = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
       const mois = `${groupe.debutMin.getMonth() + 1}/${groupe.debutMin.getFullYear()}`;
 
       const espaces = new Set();
@@ -149,8 +188,8 @@ function construireExportMensuel_(eventsGroupes, joursCourses, start, end, H, da
   return { title, rows, html };
 }
 
-function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt) {
-  const title = `Export - Liste détaillée Vincennes - ${dateDebutTxt} au ${dateFinTxt}`;
+function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, siteLabel) {
+  const title = `Export - Liste détaillée ${siteLabel} - ${dateDebutTxt} au ${dateFinTxt}`;
   const rows = [[
     "Date début",
     "Date fin",
@@ -158,6 +197,9 @@ function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, d
     "Type",
     "Client",
     "Pax",
+    "Série",
+    "Série ID",
+    "Thématique",
     "Réunion de courses",
     "Durée",
     "Espaces",
@@ -166,7 +208,8 @@ function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, d
     "Technique",
     "Autres prestataires",
     "Responsable",
-    "Commentaire"
+    "Commentaire",
+    "Options demandées"
   ]];
 
   eventsGroupes.forEach(groupe => {
@@ -175,13 +218,17 @@ function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, d
     const type = H.detecterType(evRef);
     const client = H.extraireChamp(desc, "Client");
     const pax = H.extraireChamp(desc, "Pax");
+    const serie = H.extraireChamp(desc, "Série|Serie");
+    const serieId = H.extraireChamp(desc, "Série ID|Serie ID|SérieID|SerieID");
+    const thematique = H.extraireChamp(desc, "Thématique|Thematique");
     const responsable = H.extraireResponsable(desc);
-    const reunion = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
-    const onet = H.extraireOuiNon(desc, "ONET|Prestation Nettoyage") ? "Oui" : "";
-    const cj = H.extraireOuiNon(desc, "CJ SECURITE|CJ SÉCURITÉ|Prestation Sécurité") ? "Oui" : "";
-    const technique = H.extraireOuiNon(desc, "Technique|Prestation Electricité") ? "Oui" : "";
-    const autres = H.extraireOuiNon(desc, "Autres prestataires|Raccordage Réseau") ? "Oui" : "";
+const reunion = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
+const onet = H.extraireOuiNon(desc, "ONET|Prestation Nettoyage") ? "Oui" : "";
+const cj = H.extraireOuiNon(desc, "CJ SECURITE|CJ SÉCURITÉ|Prestation Sécurité") ? "Oui" : "";
+const technique = H.extraireOuiNon(desc, "Technique|Prestation Electricité") ? "Oui" : "";
+const autres = H.extraireOuiNon(desc, "Autres prestataires|Raccordage Réseau") ? "Oui" : "";
     const commentaire = H.extraireChamp(desc, "Commentaire");
+    const optionsDemandees = getRecapRequestedOptionsLabel_(H, desc);
 
     const espaces = new Set();
     groupe.events.forEach(ev => {
@@ -201,6 +248,9 @@ function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, d
       type,
       client,
       pax,
+      serie,
+      serieId,
+      thematique,
       reunion,
       calculerDureeDepuisDates_(groupe.debutMin, groupe.finMax),
       Array.from(espaces).join(", "),
@@ -209,7 +259,8 @@ function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, d
       technique,
       autres,
       responsable,
-      commentaire
+      commentaire,
+      optionsDemandees
     ]);
   });
 
@@ -222,8 +273,8 @@ function construireExportDetail_(eventsGroupes, joursCourses, H, dateDebutTxt, d
   return { title, rows, html };
 }
 
-function construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt) {
-  const title = `Export - Récap par espace Vincennes - ${dateDebutTxt} au ${dateFinTxt}`;
+function construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, siteLabel) {
+  const title = `Export - Récap par espace ${siteLabel} - ${dateDebutTxt} au ${dateFinTxt}`;
   const rows = [[
     "Espace",
     "Date début",
@@ -266,6 +317,12 @@ function construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt
       const itemsGroupes = regrouperOccupationsEspaceParEvent_(recapEspaces[espace]);
 
       itemsGroupes.forEach(item => {
+        if (!item.type) {
+          logDebug_(
+            "construireExportParEspace_",
+            "type manquant pour espace=" + espace + ", event=" + item.event
+          );
+        }
         rows.push([
           espace,
           Utilities.formatDate(item.debut, Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm"),
@@ -291,8 +348,8 @@ function construireExportParEspace_(eventsGroupes, joursCourses, H, dateDebutTxt
   return { title, rows, html };
 }
 
-function construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt) {
-  const title = `Export - Récap par responsable Vincennes - ${dateDebutTxt} au ${dateFinTxt}`;
+function construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, siteLabel) {
+  const title = `Export - Récap par responsable ${siteLabel} - ${dateDebutTxt} au ${dateFinTxt}`;
   const rows = [[
     "Responsable",
     "Date début",
@@ -308,8 +365,11 @@ function construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDeb
     const desc = evRef.description || "";
     const type = H.detecterType(evRef);
     const client = H.extraireChamp(desc, "Client");
+    const serie = H.extraireChamp(desc, "Série|Serie");
+    const serieId = H.extraireChamp(desc, "Série ID|Serie ID|SérieID|SerieID");
+    const thematique = H.extraireChamp(desc, "Thématique|Thematique");
     const responsable = H.extraireResponsable(desc);
-    const reunion = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
+const reunion = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
 
     rows.push([
       responsable,
@@ -328,6 +388,11 @@ function construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDeb
   );
   const sortedRows = [header].concat(dataRows);
 
+  logDebug_(
+    "construireExportParResponsable_",
+    "responsables=" + dataRows.length + ", premierResponsable=" + (dataRows[0] ? dataRows[0][0] : "")
+  );
+
   const html = construireHtmlTableSimple_(
     title,
     `Période du ${dateDebutTxt} au ${dateFinTxt}`,
@@ -337,13 +402,13 @@ function construireExportParResponsable_(eventsGroupes, joursCourses, H, dateDeb
   return { title, rows: sortedRows, html };
 }
 
-function construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, filtre) {
+function construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutTxt, dateFinTxt, filtre, siteLabel) {
   const libelle =
     filtre === "ONET" ? "ONET" :
     filtre === "CJ" ? "CJ Sécurité" :
     "Technique";
 
-  const title = `Export - ${libelle} Vincennes - ${dateDebutTxt} au ${dateFinTxt}`;
+  const title = `Export - ${libelle} ${siteLabel} - ${dateDebutTxt} au ${dateFinTxt}`;
   const rows = [[
     "Date début",
     "Date fin",
@@ -360,13 +425,16 @@ function construireExportPrestataire_(eventsGroupes, joursCourses, H, dateDebutT
     const desc = evRef.description || "";
     const type = H.detecterType(evRef);
     const client = H.extraireChamp(desc, "Client");
+    const serie = H.extraireChamp(desc, "Série|Serie");
+    const serieId = H.extraireChamp(desc, "Série ID|Serie ID|SérieID|SerieID");
+    const thematique = H.extraireChamp(desc, "Thématique|Thematique");
     const responsable = H.extraireResponsable(desc);
-    const reunion = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
+const reunion = groupe.events.some(ev => H.eventToucheJourDeCourse(ev, joursCourses)) ? "Oui" : "";
 
     let keep = false;
     if (filtre === "ONET") keep = !!H.extraireOuiNon(desc, "ONET|Prestation Nettoyage");
-    if (filtre === "CJ") keep = !!H.extraireOuiNon(desc, "CJ SECURITE|CJ SÉCURITÉ|Prestation Sécurité");
-    if (filtre === "TECH") keep = !!H.extraireOuiNon(desc, "Technique|Prestation Electricité");
+if (filtre === "CJ") keep = !!H.extraireOuiNon(desc, "CJ SECURITE|CJ SÉCURITÉ|Prestation Sécurité");
+if (filtre === "TECH") keep = !!H.extraireOuiNon(desc, "Technique|Prestation Electricité");
 
     if (!keep) return;
 
@@ -445,7 +513,7 @@ function exporterRowsEnExcel_(title, rows) {
   sheet.autoResizeColumns(1, rows[0].length);
 
   const xlsxBlob = UrlFetchApp.fetch(
-    "https://docs.google.com/spreadsheets/d/" + ss.getId() + "/export?format=xlsx",
+    "https://docs.google.com/spreadsheets/d/" + ss.getId() + "/exportformat=xlsx",
     {
       headers: {
         Authorization: "Bearer " + ScriptApp.getOAuthToken()
@@ -489,3 +557,4 @@ function escapeHtml_(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
+

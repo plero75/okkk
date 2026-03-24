@@ -4,561 +4,231 @@
     <base target="_top">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Récap Vincennes</title>
+    <title>Recap hippodromes</title>
     <style>
       :root{
-        --bg:#f3f6fb;
+        --bg:#f3f7fc;
         --card:#ffffff;
-        --line:#e5e7eb;
-        --text:#111827;
-        --muted:#6b7280;
-        --accent:#0f172a;
-        --accent-2:#1d4ed8;
-        --accent-soft:#dbeafe;
-        --accent-border:#93c5fd;
-        --orange-soft:#fff7ed;
-        --orange:#c2410c;
-        --shadow:0 10px 30px rgba(15,23,42,0.07);
-        --radius:20px;
+        --line:#dbe6f1;
+        --text:#122033;
+        --muted:#667b92;
+        --navy:#1f3f72;
+        --navy-2:#355b98;
+        --blue:#3f73ff;
+        --teal:#1fcab7;
+        --pill:#eef4ff;
+        --warn:#fff7e8;
+        --warn-border:#ffd58a;
+        --shadow:0 18px 42px rgba(17,34,54,.09);
+        --radius:22px;
+        --font:"Avenir Next","Segoe UI","Trebuchet MS",sans-serif;
       }
 
-      *{ box-sizing:border-box; }
-
-      html, body{
-        margin:0;
-        padding:0;
-        font-family:Arial, sans-serif;
-        background:var(--bg);
-        color:var(--text);
-      }
-
-      body{ padding:24px; }
-
-      .page{
-        max-width:1280px;
-        margin:0 auto;
-      }
-
-      .hero{
-        background:linear-gradient(135deg,#ffffff 0%,#f8fbff 60%,#fffaf5 100%);
-        border:1px solid #edf1f6;
-        border-radius:24px;
-        padding:24px 24px 18px 24px;
-        box-shadow:var(--shadow);
-        margin-bottom:18px;
-      }
-
-      .hero-badge{
-        display:inline-block;
-        margin-bottom:12px;
-        padding:7px 12px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:700;
-        background:var(--orange-soft);
-        color:var(--orange);
-        border:1px solid #fed7aa;
-      }
-
-      h1{
-        margin:0;
-        font-size:30px;
-        line-height:1.1;
-        letter-spacing:-0.4px;
-      }
-
-      .hero-sub{
-        margin-top:10px;
-        color:var(--muted);
-        font-size:15px;
-      }
-
-      .split{
-        display:grid;
-        grid-template-columns:430px 1fr;
-        gap:18px;
-        align-items:start;
-      }
-
-      .card{
-        background:var(--card);
-        border:1px solid var(--line);
-        border-radius:var(--radius);
-        padding:22px;
-        box-shadow:var(--shadow);
-      }
-
-      .section-title{
-        margin:0 0 8px 0;
-        font-size:20px;
-        font-weight:800;
-      }
-
-      .section-intro{
-        margin:0 0 18px 0;
-        color:var(--muted);
-        font-size:13px;
-        line-height:1.5;
-      }
-
-      .stack{
-        display:flex;
-        flex-direction:column;
-        gap:16px;
-      }
-
-      .subcard{
-        border:1px solid #edf1f6;
-        border-radius:18px;
-        background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);
-        padding:16px;
-      }
-
-      .subcard-title{
-        display:flex;
-        align-items:center;
-        gap:10px;
-        margin:0 0 8px 0;
-        font-size:15px;
-        font-weight:800;
-      }
-
-      .subcard-step{
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        width:24px;
-        height:24px;
-        border-radius:999px;
-        background:var(--accent-soft);
-        color:var(--accent-2);
-        font-size:12px;
-        font-weight:800;
-      }
-
-      .preset-title{
-        font-size:13px;
-        font-weight:700;
-        color:var(--muted);
-        margin-bottom:10px;
-      }
-
-      .preset-grid{
-        display:flex;
-        flex-wrap:wrap;
-        gap:10px;
-        margin-bottom:18px;
-      }
-
-      .preset-btn{
-        border:1px solid #dbe3ee;
-        background:#fff;
-        color:#0f172a;
-        border-radius:999px;
-        padding:10px 14px;
-        font-size:13px;
-        font-weight:700;
-        cursor:pointer;
-        transition:all .15s ease;
-      }
-
-      .preset-btn:hover{
-        background:#f8fafc;
-        transform:translateY(-1px);
-      }
-
-      .preset-btn.active{
-        background:var(--accent-soft);
-        border-color:var(--accent-border);
-        color:var(--accent-2);
-      }
-
-      .grid{
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:16px;
-      }
-
-      .row{ margin-bottom:16px; }
-      .row:last-child{ margin-bottom:0; }
-
-      label{
-        display:block;
-        font-weight:700;
-        margin-bottom:7px;
-        font-size:14px;
-      }
-
-      .mode-badge{
-        display:inline-block;
-        margin-left:8px;
-        padding:4px 8px;
-        border-radius:999px;
-        font-size:11px;
-        font-weight:700;
-        background:#f3f4f6;
-        color:#374151;
-        vertical-align:middle;
-      }
-
-      input, select{
-        width:100%;
-        padding:12px 14px;
-        border:1px solid #d1d5db;
-        border-radius:12px;
-        font-size:14px;
-        background:#fff;
-        color:var(--text);
-      }
-
-      input:focus, select:focus{
-        outline:none;
-        border-color:#93c5fd;
-        box-shadow:0 0 0 4px rgba(59,130,246,0.12);
-      }
-
-      .small{
-        color:var(--muted);
-        font-size:12px;
-        margin-top:6px;
-      }
-
-      .hidden{ display:none; }
-
-      .summary{
-        display:grid;
-        grid-template-columns:1fr 1fr;
-        gap:10px;
-      }
-
-      .summary-item{
-        padding:12px;
-        border-radius:14px;
-        background:#f8fafc;
-        border:1px solid #e5e7eb;
-      }
-
-      .summary-label{
-        display:block;
-        font-size:11px;
-        font-weight:700;
-        color:var(--muted);
-        text-transform:uppercase;
-        letter-spacing:.04em;
-        margin-bottom:4px;
-      }
-
-      .summary-value{
-        font-size:13px;
-        font-weight:700;
-        color:var(--text);
-        line-height:1.35;
-      }
-
-      .buttons{
-        display:flex;
-        gap:12px;
-        flex-wrap:wrap;
-        margin-top:6px;
-      }
-
-      button.action{
-        border:0;
-        border-radius:12px;
-        padding:12px 18px;
-        font-size:14px;
-        font-weight:700;
-        cursor:pointer;
-        transition:transform .15s ease, opacity .15s ease;
-      }
-
-      button.action:hover{ transform:translateY(-1px); }
-      .btn-light{ background:#e5e7eb; color:#111827; }
-      .btn-dark{ background:var(--accent); color:#fff; }
-      .btn-blue{ background:#1d4ed8; color:#fff; }
-
-      .export-box{
-        padding:14px;
-        border:1px solid #e5e7eb;
-        border-radius:16px;
-        background:#fafcff;
-        margin-bottom:14px;
-      }
-
-      .export-title{
-        font-size:14px;
-        font-weight:800;
-        margin:0 0 12px 0;
-      }
-
-      .status{
-        margin-top:14px;
-        font-size:14px;
-        color:#b45309;
-        min-height:18px;
-        padding:10px 12px;
-        border-radius:12px;
-        background:#fff7ed;
-        border:1px solid #fed7aa;
-      }
-
-      .status:empty{ display:none; }
-
-      .subject-box{
-        display:none;
-        background:#f9fafb;
-        border:1px solid var(--line);
-        border-radius:14px;
-        padding:14px;
-        margin-top:14px;
-      }
-
-      .subject-box strong{
-        display:block;
-        margin-bottom:4px;
-      }
-
-      .link-box{
-        display:none;
-        margin-top:14px;
-        padding:12px 14px;
-        border-radius:14px;
-        background:#f0f9ff;
-        border:1px solid #bae6fd;
-        color:#0c4a6e;
-        font-size:14px;
-        word-break:break-word;
-      }
-
-      .link-box a{
-        color:#0369a1;
-        font-weight:700;
-        text-decoration:none;
-      }
-
-      .preview-shell{
-        display:flex;
-        flex-direction:column;
-        gap:12px;
-      }
-
-      .preview-header{
-        display:flex;
-        justify-content:space-between;
-        align-items:flex-start;
-        gap:12px;
-        padding:18px;
-        border-radius:20px;
-        background:linear-gradient(135deg,#ffffff 0%,#f8fbff 100%);
-        border:1px solid #edf1f6;
-        box-shadow:var(--shadow);
-      }
-
-      .preview-title{
-        margin:0;
-        font-size:19px;
-        font-weight:800;
-      }
-
-      .preview-subtitle{
-        margin:6px 0 0 0;
-        color:var(--muted);
-        font-size:13px;
-        line-height:1.5;
-      }
-
-      .preview-meta{
-        display:flex;
-        flex-wrap:wrap;
-        justify-content:flex-end;
-        gap:8px;
-      }
-
-      .chip{
-        display:inline-flex;
-        align-items:center;
-        padding:7px 10px;
-        border-radius:999px;
-        background:#eff6ff;
-        color:#1d4ed8;
-        font-size:12px;
-        font-weight:700;
-        border:1px solid #bfdbfe;
-      }
-
-      .preview{
-        background:#fff;
-        border:1px solid var(--line);
-        border-radius:20px;
-        padding:12px;
-        min-height:540px;
-        height:540px;
-        overflow:auto;
-        box-shadow:0 8px 24px rgba(15,23,42,0.05);
-      }
-
-      .empty-preview{
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100%;
-        text-align:center;
-        color:var(--muted);
-        font-size:14px;
-        padding:24px;
-        line-height:1.6;
-      }
-
-      @media (max-width: 980px){
-        .split{ grid-template-columns:1fr; }
-        .grid, .summary{ grid-template-columns:1fr; }
-        .preview-header{ flex-direction:column; }
-        .preview-meta{ justify-content:flex-start; }
-      }
+      *{box-sizing:border-box}
+      html,body{margin:0;padding:0;font-family:var(--font);color:var(--text);background:linear-gradient(180deg,#f8fbff 0%,var(--bg) 100%)}
+      body{padding:20px}
+      button,input,select{font:inherit}
+      button{cursor:pointer}
+      .page{max-width:1320px;margin:0 auto}
+      .hero,.card,.preview-shell,.status{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow)}
+      .hero{border-radius:30px;padding:24px 26px;background:linear-gradient(135deg,#ffffff 0%,#f8fbff 55%,#eff8ff 100%)}
+      .hero-pill{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;background:#fff4dc;color:#8f6100;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+      .hero h1{margin:14px 0 0;font-size:32px;line-height:1.02;letter-spacing:-.04em}
+      .hero p{margin:10px 0 0;color:var(--muted);font-size:14px;line-height:1.55}
+      .layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:18px;margin-top:18px}
+      .card,.preview-shell{border-radius:26px;padding:20px}
+      .stack{display:flex;flex-direction:column;gap:16px}
+      .block{border:1px solid #e5edf5;border-radius:20px;padding:16px;background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%)}
+      .block h2{margin:0;font-size:18px;letter-spacing:-.02em}
+      .block p{margin:6px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+      .row{margin-top:14px}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+      label{display:block;margin-bottom:7px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#53687d}
+      input,select{width:100%;padding:12px 14px;border-radius:14px;border:1px solid #cfdae5;background:#fff;color:var(--text)}
+      input:focus,select:focus{outline:none;border-color:#9eb6ff;box-shadow:0 0 0 4px rgba(63,115,255,.12)}
+      .small{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.45}
+      .hidden{display:none}
+      .preset-row,.btn-row,.chips{display:flex;flex-wrap:wrap;gap:10px}
+      .preset{border:1px solid #d8e4ef;border-radius:999px;background:#fff;padding:9px 12px;font-size:12px;font-weight:800;color:#27435d}
+      .preset.active{background:var(--pill);border-color:#bfd2ff;color:#3558da}
+      .btn{border:none;border-radius:16px;padding:12px 14px;font-weight:800;transition:.16s ease}
+      .btn:hover{transform:translateY(-1px)}
+      .btn.primary{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 100%);color:#fff}
+      .btn.secondary{background:#eef4ff;color:#3558da;border:1px solid #cdddff}
+      .btn.ghost{background:#fff;color:var(--text);border:1px solid #d8e4ef}
+      .summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+      .summary-item{padding:12px;border-radius:16px;background:#f7faff;border:1px solid #e1ebf4}
+      .summary-label{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#60758a}
+      .summary-value{display:block;margin-top:4px;font-size:13px;font-weight:700;line-height:1.4}
+      .status{margin-top:16px;border-radius:18px;padding:13px 14px;background:var(--warn);border-color:var(--warn-border);font-size:13px;color:#8a5a00}
+      .status:empty{display:none}
+      .preview-shell{display:flex;flex-direction:column;gap:14px;min-width:0}
+      .preview-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+      .preview-head h2{margin:0;font-size:20px;letter-spacing:-.02em}
+      .preview-head p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+      .chips{justify-content:flex-end}
+      .chip{display:inline-flex;align-items:center;padding:7px 10px;border-radius:999px;background:#eef4ff;border:1px solid #cadeff;color:#3558da;font-size:12px;font-weight:800}
+      .subject-box,.link-box{padding:14px;border-radius:18px;border:1px solid #d9e5ef;background:#f8fbff}
+      .subject-box strong,.link-box strong{display:block;margin-bottom:5px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#62778c}
+      .preview{min-height:620px;height:620px;overflow:auto;border:1px solid var(--line);border-radius:22px;background:#fff}
+      .preview iframe{width:100%;height:100%;border:none;border-radius:22px}
+      .empty-preview{display:flex;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;color:var(--muted);font-size:14px;line-height:1.6}
+      @media (max-width:1040px){.layout{grid-template-columns:1fr}.grid,.summary{grid-template-columns:1fr}.chips{justify-content:flex-start}}
     </style>
   </head>
   <body>
     <div class="page">
-      <div class="hero">
-        <div class="hero-badge">Hippodrome Paris-Vincennes</div>
-        <h1>Récap Vincennes</h1>
-        <div class="hero-sub">Prévisualisation, envoi mail et export de rapports</div>
-      </div>
+      <section class="hero">
+        <div class="hero-pill" id="heroBadge">Hippodrome Paris-Vincennes</div>
+        <h1 id="heroTitle">Recap Vincennes</h1>
+        <p id="heroSubtitle">Previsualisation, envoi mail et export de rapports pour le site actif.</p>
+      </section>
 
-      <div class="split">
-        <div>
-          <div class="card">
-            <h2 class="section-title">Paramétrage</h2>
-            <div class="section-intro">Préparez votre période, choisissez le destinataire et vérifiez le résumé avant de lancer l’aperçu, l’envoi du mail ou l’export.</div>
-
-            <div class="stack">
-              <div class="subcard">
-                <div class="subcard-title"><span class="subcard-step">1</span> Période</div>
-                <div class="preset-title">Raccourcis de période</div>
-                <div class="preset-grid">
-                  <button type="button" class="preset-btn" onclick="applyPreset('mois_en_cours', this)">Mois en cours</button>
-                  <button type="button" class="preset-btn" onclick="applyPreset('mois_prochain', this)">Mois prochain</button>
-                  <button type="button" class="preset-btn" onclick="applyPreset('annee_en_cours', this)">Année en cours</button>
-                  <button type="button" class="preset-btn" onclick="applyPreset('reste_annee_en_cours', this)">Restant année en cours</button>
-                  <button type="button" class="preset-btn" onclick="applyPreset('6_prochains_mois', this)">6 prochains mois</button>
-                  <button type="button" class="preset-btn" onclick="applyPreset('25_prochains_evenements', this)">25 prochains événements</button>
-                </div>
-
-                <div class="grid">
-                  <div class="row">
-                    <label for="dateDebut">Date de début <span class="mode-badge" id="modeBadge">Mode manuel</span></label>
-                    <input type="date" id="dateDebut">
-                    <div class="small">Par défaut, la date du jour est proposée.</div>
-                  </div>
-                  <div class="row">
-                    <label for="dateFin">Date de fin</label>
-                    <input type="date" id="dateFin">
-                    <div class="small" id="dateFinHint">Choix manuel ou via les raccourcis ci-dessus.</div>
-                  </div>
+      <div class="layout">
+        <section class="card">
+          <div class="stack">
+            <article class="block">
+              <h2>Contexte</h2>
+              <p>Choisis le site, la periode et le mode de lecture avant de generer le mail ou un export.</p>
+              <div class="row">
+                <label for="siteKey">Site</label>
+                <select id="siteKey"></select>
+                <div class="small" id="siteHelp">Le recap et les exports utilisent le site selectionne.</div>
+              </div>
+              <div class="row">
+                <label>Raccourcis</label>
+                <div class="preset-row">
+                  <button type="button" class="preset" data-preset="mois_en_cours">Mois en cours</button>
+                  <button type="button" class="preset" data-preset="mois_prochain">Mois prochain</button>
+                  <button type="button" class="preset" data-preset="annee_en_cours">Annee en cours</button>
+                  <button type="button" class="preset" data-preset="reste_annee_en_cours">Reste annee</button>
+                  <button type="button" class="preset" data-preset="6_prochains_mois">6 prochains mois</button>
+                  <button type="button" class="preset" data-preset="25_prochains_evenements">25 prochains evenements</button>
                 </div>
               </div>
-
-              <div class="subcard">
-                <div class="subcard-title"><span class="subcard-step">2</span> Destinataire</div>
+              <div class="grid">
                 <div class="row">
-                  <label for="emailChoisi">Destinataire</label>
-                  <select id="emailChoisi"></select>
+                  <label for="dateDebut">Date de debut</label>
+                  <input type="date" id="dateDebut">
+                  <div class="small" id="modeHint">Mode manuel.</div>
                 </div>
-                <div class="row hidden" id="emailLibreWrapper">
-                  <label for="emailLibre">Email personnalisé</label>
-                  <input type="email" id="emailLibre" placeholder="nom@domaine.com">
+                <div class="row">
+                  <label for="dateFin">Date de fin</label>
+                  <input type="date" id="dateFin">
+                  <div class="small" id="dateFinHint">Utilisee pour les recaps manuels et les exports.</div>
+                </div>
+              </div>
+            </article>
+
+            <article class="block">
+              <h2>Destinataire</h2>
+              <p>Le mail recap et son apercu utilisent ce destinataire.</p>
+              <div class="row">
+                <label for="emailChoisi">Destinataire</label>
+                <select id="emailChoisi"></select>
+              </div>
+              <div class="row hidden" id="emailLibreWrapper">
+                <label for="emailLibre">Email libre</label>
+                <input type="email" id="emailLibre" placeholder="prenom.nom@domaine.fr">
+              </div>
+            </article>
+
+            <article class="block">
+              <h2>Sortie</h2>
+              <p>Le meme contexte peut servir a envoyer le mail ou a sortir un rapport PDF / Excel.</p>
+              <div class="grid">
+                <div class="row">
+                  <label for="typeExport">Contenu</label>
+                  <select id="typeExport">
+                    <option value="mensuel">Recap mensuel</option>
+                    <option value="detail">Liste detaillee</option>
+                    <option value="espace">Recap par espace</option>
+                    <option value="responsable">Recap par responsable</option>
+                    <option value="onet">Recap ONET</option>
+                    <option value="cj">Recap CJ Securite</option>
+                    <option value="tech">Recap Technique</option>
+                  </select>
+                </div>
+                <div class="row">
+                  <label for="formatExport">Format</label>
+                  <select id="formatExport">
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                  </select>
                 </div>
               </div>
 
-              <div class="subcard">
-                <div class="subcard-title"><span class="subcard-step">3</span> Sortie</div>
-                <div class="export-box">
-                  <div class="export-title">Export</div>
-                  <div class="row">
-                    <label for="typeExport">Contenu à exporter</label>
-                    <select id="typeExport">
-                      <option value="mensuel">Récap mensuel</option>
-                      <option value="detail">Liste détaillée</option>
-                      <option value="espace">Récap par espace</option>
-                      <option value="responsable">Récap par responsable</option>
-                      <option value="onet">Récap ONET</option>
-                      <option value="cj">Récap CJ Sécurité</option>
-                      <option value="tech">Récap Technique</option>
-                    </select>
-                  </div>
-                  <div class="row">
-                    <label for="formatExport">Format</label>
-                    <select id="formatExport">
-                      <option value="pdf">PDF</option>
-                      <option value="excel">Excel</option>
-                    </select>
-                  </div>
-                  <div class="buttons">
-                    <button class="action btn-blue" onclick="lancerExport()">Générer l’export</button>
-                  </div>
-                  <div class="link-box" id="exportLinkBox"></div>
+              <div class="summary">
+                <div class="summary-item">
+                  <span class="summary-label">Mode</span>
+                  <span class="summary-value" id="summaryMode">Mode manuel</span>
                 </div>
-
-                <div class="summary">
-                  <div class="summary-item">
-                    <span class="summary-label">Mode</span>
-                    <span class="summary-value" id="summaryMode">Mode manuel</span>
-                  </div>
-                  <div class="summary-item">
-                    <span class="summary-label">Période</span>
-                    <span class="summary-value" id="summaryRange">À compléter</span>
-                  </div>
-                  <div class="summary-item">
-                    <span class="summary-label">Destinataire</span>
-                    <span class="summary-value" id="summaryRecipient">À compléter</span>
-                  </div>
-                  <div class="summary-item">
-                    <span class="summary-label">Sortie</span>
-                    <span class="summary-value" id="summaryExport">Récap mensuel • PDF</span>
-                  </div>
+                <div class="summary-item">
+                  <span class="summary-label">Periode</span>
+                  <span class="summary-value" id="summaryRange">A completer</span>
                 </div>
-
-                <div class="buttons" style="margin-top:18px;">
-                  <button class="action btn-light" onclick="genererPreview()">Prévisualiser</button>
-                  <button class="action btn-dark" onclick="envoyerMail()">Envoyer le mail</button>
-                  <button class="action btn-light" onclick="google.script.host.close()">Fermer</button>
+                <div class="summary-item">
+                  <span class="summary-label">Destinataire</span>
+                  <span class="summary-value" id="summaryRecipient">A completer</span>
                 </div>
-
-                <div class="status" id="status"></div>
-
-                <div class="subject-box" id="subjectBox">
-                  <strong>Objet</strong>
-                  <div id="subjectText"></div>
+                <div class="summary-item">
+                  <span class="summary-label">Export</span>
+                  <span class="summary-value" id="summaryExport">Recap mensuel - PDF</span>
                 </div>
               </div>
-            </div>
+            </article>
           </div>
-        </div>
 
-        <div>
-          <div class="preview-shell">
-            <div class="preview-header">
-              <div>
-                <h2 class="preview-title">Aperçu en direct</h2>
-                <p class="preview-subtitle">Visualisez le rendu généré avant envoi ou export. Les indicateurs de contexte à droite suivent automatiquement vos choix.</p>
-              </div>
-              <div class="preview-meta" id="previewMeta">
-                <span class="chip">Aucun aperçu</span>
-              </div>
-            </div>
-            <div class="preview" id="preview">
-              <div class="empty-preview">Aucun aperçu pour le moment.<br>Renseignez les champs puis cliquez sur <strong>Prévisualiser</strong>.</div>
-            </div>
+          <div class="btn-row" style="margin-top:18px">
+            <button type="button" class="btn secondary" id="previewBtn">Previsualiser</button>
+            <button type="button" class="btn primary" id="sendBtn">Envoyer le mail</button>
+            <button type="button" class="btn ghost" id="exportBtn">Generer l'export</button>
+            <button type="button" class="btn ghost" id="closeBtn">Fermer</button>
           </div>
-        </div>
+
+          <div class="status" id="status"></div>
+        </section>
+
+        <section class="preview-shell">
+          <div class="preview-head">
+            <div>
+              <h2>Apercu en direct</h2>
+              <p>Le rendu se met a jour a partir du site, de la plage et du destinataire selectionnes.</p>
+            </div>
+            <div class="chips" id="previewMeta"></div>
+          </div>
+
+          <div class="subject-box">
+            <strong>Objet</strong>
+            <div id="subjectText">Aucun sujet genere.</div>
+          </div>
+
+          <div class="link-box" id="exportLinkBox">
+            <strong>Export</strong>
+            <div id="exportLinkText">Aucun export genere.</div>
+          </div>
+
+          <div class="preview" id="preview">
+            <div class="empty-preview">Aucun apercu pour le moment.<br>Renseigne les champs puis clique sur <strong>Previsualiser</strong>.</div>
+          </div>
+        </section>
       </div>
     </div>
 
     <script>
       let currentMode = "manuel";
+      const DEFAULT_SITE_KEY = <?!= JSON.stringify(defaultSiteKey || "VINCENNES") ?>;
 
-      function setStatus(message) {
-        document.getElementById("status").textContent = message || "";
+      function $(id) { return document.getElementById(id); }
+
+      function siteLabelFromKey(siteKey) {
+        return String(siteKey || "").toUpperCase() === "ENGHIEN" ? "Enghien" : "Vincennes";
+      }
+
+      function siteFullLabelFromKey(siteKey) {
+        return String(siteKey || "").toUpperCase() === "ENGHIEN"
+          ? "Hippodrome Enghien-Soisy"
+          : "Hippodrome Paris-Vincennes";
       }
 
       function formatDateInput(date) {
@@ -569,7 +239,7 @@
       }
 
       function formatDateDisplay(value) {
-        if (!value) return "À compléter";
+        if (!value) return "A completer";
         const parts = value.split("-");
         return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
       }
@@ -579,66 +249,79 @@
           manuel: "Mode manuel",
           mois_en_cours: "Mois en cours",
           mois_prochain: "Mois prochain",
-          annee_en_cours: "Année en cours",
-          reste_annee_en_cours: "Restant année en cours",
+          annee_en_cours: "Annee en cours",
+          reste_annee_en_cours: "Reste annee en cours",
           "6_prochains_mois": "6 prochains mois",
-          "25_prochains_evenements": "25 prochains événements"
+          "25_prochains_evenements": "25 prochains evenements"
         };
         return labels[mode] || "Mode manuel";
       }
 
       function getSelectedText(id) {
-        const select = document.getElementById(id);
+        const select = $(id);
         if (!select || select.selectedIndex < 0) return "";
         return select.options[select.selectedIndex].textContent;
       }
 
+      function setStatus(message, isError) {
+        const box = $("status");
+        box.textContent = message || "";
+        box.style.color = isError ? "#a63d18" : "#8a5a00";
+        box.style.background = isError ? "#fff1ec" : "#fff7e8";
+        box.style.borderColor = isError ? "#ffc8b7" : "#ffd58a";
+      }
+
       function updatePreviewMeta(items) {
-        const meta = document.getElementById("previewMeta");
-        meta.innerHTML = "";
-        items.forEach(text => {
-          const chip = document.createElement("span");
-          chip.className = "chip";
-          chip.textContent = text;
-          meta.appendChild(chip);
-        });
+        $("previewMeta").innerHTML = (items || []).map(function(text) {
+          return `<span class="chip">${text}</span>`;
+        }).join("");
+      }
+
+      function syncSitePresentation() {
+        const siteKey = $("siteKey").value;
+        const siteLabel = siteLabelFromKey(siteKey);
+        $("heroBadge").textContent = siteFullLabelFromKey(siteKey);
+        $("heroTitle").textContent = `Recap ${siteLabel}`;
+        $("heroSubtitle").textContent = `Previsualisation, envoi mail et export de rapports pour ${siteLabel}.`;
+        $("siteHelp").textContent = `Le recap et les exports utilisent ${siteLabel}.`;
       }
 
       function updateFormSummary() {
+        const siteLabel = siteLabelFromKey($("siteKey").value);
         const modeLabel = getModeLabel(currentMode);
-        const start = document.getElementById("dateDebut").value;
-        const end = document.getElementById("dateFin").value;
-        const emailSelect = document.getElementById("emailChoisi");
-        const recipient = emailSelect && emailSelect.value === "__custom__"
-          ? (document.getElementById("emailLibre").value || "Email personnalisé")
+        const start = $("dateDebut").value;
+        const end = $("dateFin").value;
+        const recipient = $("emailChoisi").value === "__custom__"
+          ? ($("emailLibre").value || "Email personnalise")
           : getSelectedText("emailChoisi").replace(/\s*\(.+\)\s*$/, "");
-        const exportText = `${getSelectedText("typeExport")} • ${getSelectedText("formatExport")}`;
+        const exportText = `${getSelectedText("typeExport")} - ${getSelectedText("formatExport")}`;
         const rangeText = currentMode === "25_prochains_evenements"
-          ? `À partir du ${formatDateDisplay(start)}`
-          : `${formatDateDisplay(start)} → ${formatDateDisplay(end)}`;
+          ? `A partir du ${formatDateDisplay(start)}`
+          : `${formatDateDisplay(start)} -> ${formatDateDisplay(end)}`;
 
-        document.getElementById("summaryMode").textContent = modeLabel;
-        document.getElementById("summaryRange").textContent = rangeText;
-        document.getElementById("summaryRecipient").textContent = recipient || "À compléter";
-        document.getElementById("summaryExport").textContent = exportText;
+        $("summaryMode").textContent = `${siteLabel} - ${modeLabel}`;
+        $("summaryRange").textContent = rangeText;
+        $("summaryRecipient").textContent = recipient || "A completer";
+        $("summaryExport").textContent = exportText;
 
-        updatePreviewMeta([modeLabel, exportText, rangeText]);
+        updatePreviewMeta([siteLabel, modeLabel, exportText, rangeText]);
       }
 
       function toggleCustomEmail() {
-        const value = document.getElementById("emailChoisi").value;
-        document.getElementById("emailLibreWrapper").classList.toggle("hidden", value !== "__custom__");
+        $("emailLibreWrapper").classList.toggle("hidden", $("emailChoisi").value !== "__custom__");
         updateFormSummary();
       }
 
       function clearPresetButtons() {
-        document.querySelectorAll(".preset-btn").forEach(btn => btn.classList.remove("active"));
+        document.querySelectorAll(".preset").forEach(function(btn) {
+          btn.classList.remove("active");
+        });
       }
 
-      function applyPreset(mode, btn) {
+      function applyPreset(mode, button) {
         currentMode = mode;
         clearPresetButtons();
-        if (btn) btn.classList.add("active");
+        if (button) button.classList.add("active");
 
         const today = new Date();
         let start = null;
@@ -647,167 +330,225 @@
         if (mode === "mois_en_cours") {
           start = new Date(today.getFullYear(), today.getMonth(), 1);
           end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        }
-        if (mode === "mois_prochain") {
+        } else if (mode === "mois_prochain") {
           start = new Date(today.getFullYear(), today.getMonth() + 1, 1);
           end = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-        }
-        if (mode === "annee_en_cours") {
+        } else if (mode === "annee_en_cours") {
           start = new Date(today.getFullYear(), 0, 1);
           end = new Date(today.getFullYear(), 11, 31);
-        }
-        if (mode === "reste_annee_en_cours") {
+        } else if (mode === "reste_annee_en_cours") {
           start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
           end = new Date(today.getFullYear(), 11, 31);
-        }
-        if (mode === "6_prochains_mois") {
+        } else if (mode === "6_prochains_mois") {
           start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
           end = new Date(today.getFullYear(), today.getMonth() + 6, today.getDate());
         }
+
         if (mode === "25_prochains_evenements") {
-          document.getElementById("dateDebut").value = formatDateInput(today);
-          document.getElementById("dateFin").value = "";
-          document.getElementById("dateFin").disabled = true;
-          document.getElementById("dateFinHint").textContent = "La date de fin n’est pas utilisée dans ce mode.";
-          document.getElementById("modeBadge").textContent = "25 prochains événements";
+          $("dateDebut").value = formatDateInput(today);
+          $("dateFin").value = "";
+          $("dateFin").disabled = true;
+          $("modeHint").textContent = "Mode 25 prochains evenements.";
+          $("dateFinHint").textContent = "La date de fin n'est pas utilisee dans ce mode.";
           updateFormSummary();
           return;
         }
 
-        document.getElementById("dateFin").disabled = false;
-        document.getElementById("dateFinHint").textContent = "Choix manuel ou via les raccourcis ci-dessus.";
-        document.getElementById("modeBadge").textContent = "Mode automatique";
-        if (start) document.getElementById("dateDebut").value = formatDateInput(start);
-        if (end) document.getElementById("dateFin").value = formatDateInput(end);
+        $("dateFin").disabled = false;
+        $("modeHint").textContent = mode === "manuel" ? "Mode manuel." : "Mode automatique.";
+        $("dateFinHint").textContent = "Utilisee pour les recaps manuels et les exports.";
+        if (start) $("dateDebut").value = formatDateInput(start);
+        if (end) $("dateFin").value = formatDateInput(end);
         updateFormSummary();
+      }
+
+      function populateSiteOptions(data) {
+        const sites = Array.isArray(data && data.sites) && data.sites.length
+          ? data.sites
+          : [
+              { value: "VINCENNES", label: "Vincennes" },
+              { value: "ENGHIEN", label: "Enghien" }
+            ];
+
+        $("siteKey").innerHTML = sites.map(function(site) {
+          return `<option value="${site.value}">${site.label}</option>`;
+        }).join("");
+        $("siteKey").value = data && data.siteKey ? data.siteKey : DEFAULT_SITE_KEY;
+      }
+
+      function populateEmailOptions(data, preserveValue) {
+        const emails = Array.isArray(data && data.emails) && data.emails.length
+          ? data.emails
+          : [
+              { label: "Jad Zoghbi", value: "jad.zoghbi@letrot.com" },
+              { label: "Paul Lerosier", value: "ext.paul.lerosier@letrot.com" },
+              { label: "Email personnalise", value: "__custom__" }
+            ];
+        const targetValue = preserveValue || (data && data.emailDefaut ? data.emailDefaut : (emails[0] ? emails[0].value : ""));
+
+        $("emailChoisi").innerHTML = emails.map(function(item) {
+          return `<option value="${item.value}">${item.label} (${item.value})</option>`;
+        }).join("");
+        $("emailChoisi").value = targetValue;
+        if (!$("emailChoisi").value && emails.length) $("emailChoisi").value = emails[0].value;
+      }
+
+      function refreshSiteConfig(preserveRecipient) {
+        const previousRecipient = preserveRecipient ? $("emailChoisi").value : "";
+        const previousCustom = preserveRecipient ? $("emailLibre").value : "";
+        google.script.run
+          .withSuccessHandler(function(data) {
+            populateEmailOptions(data, previousRecipient);
+            if (preserveRecipient) $("emailLibre").value = previousCustom;
+            syncSitePresentation();
+            toggleCustomEmail();
+          })
+          .withFailureHandler(function(error) {
+            setStatus("Impossible de charger la configuration du site : " + (error && error.message ? error.message : error), true);
+          })
+          .getDialogDefaultsP1_($("siteKey").value);
       }
 
       function collectForm() {
         const form = {
+          siteKey: $("siteKey").value,
           mode: currentMode,
-          dateDebut: document.getElementById("dateDebut").value,
-          dateFin: document.getElementById("dateFin").value,
-          emailChoisi: document.getElementById("emailChoisi").value,
-          emailLibre: document.getElementById("emailLibre").value,
-          typeExport: document.getElementById("typeExport").value,
-          formatExport: document.getElementById("formatExport").value
+          dateDebut: $("dateDebut").value,
+          dateFin: $("dateFin").value,
+          emailChoisi: $("emailChoisi").value,
+          emailLibre: $("emailLibre").value.trim(),
+          typeExport: $("typeExport").value,
+          formatExport: $("formatExport").value
         };
 
-        if (!form.dateDebut) throw new Error("Merci de saisir une date de début.");
+        if (!form.dateDebut) throw new Error("Merci de saisir une date de debut.");
         if (form.mode !== "25_prochains_evenements" && !form.dateFin) throw new Error("Merci de saisir une date de fin.");
         return form;
       }
 
-      function initForm(data){
-        const select = document.getElementById("emailChoisi");
-        select.innerHTML = "";
-
-        const defaults = (data && Array.isArray(data.emailOptions) ? data.emailOptions : null) || [
-          { label: "Jad Zoghbi", value: "jad.zoghbi@letrot.com" },
-          { label: "Paul Lerosier", value: "ext.paul.lerosier@letrot.com" }
-        ];
-
-        defaults.forEach(item => {
-          const option = document.createElement("option");
-          option.value = item.value;
-          option.textContent = `${item.label} (${item.value})`;
-          select.appendChild(option);
-        });
-
-        const customOption = document.createElement("option");
-        customOption.value = "__custom__";
-        customOption.textContent = "Email personnalisé";
-        select.appendChild(customOption);
-
-        if (data && data.emailDefaut) select.value = data.emailDefaut;
-
-        document.getElementById("dateDebut").value = document.getElementById("dateDebut").value || formatDateInput(new Date());
-        toggleCustomEmail();
-        updateFormSummary();
+      function renderPreview(payload) {
+        $("subjectText").textContent = payload && payload.subject ? payload.subject : "Aucun sujet genere.";
+        $("preview").innerHTML = payload && payload.htmlBody
+          ? payload.htmlBody
+          : `<div class="empty-preview">Aucun apercu genere.</div>`;
       }
 
       function genererPreview() {
         let form;
         try {
           form = collectForm();
-        } catch(e) {
-          setStatus(e.message);
+        } catch (error) {
+          setStatus(error.message || String(error), true);
           return;
         }
 
-        setStatus("Génération de l’aperçu…");
+        setStatus("Generation de l'apercu en cours...");
         google.script.run
           .withSuccessHandler(function(payload) {
-            document.getElementById("preview").innerHTML = payload.htmlBody;
-            document.getElementById("subjectText").textContent = payload.subject;
-            document.getElementById("subjectBox").style.display = "block";
-            updatePreviewMeta(["Aperçu généré", getModeLabel(currentMode), document.getElementById("summaryExport").textContent]);
-            setStatus("Aperçu généré.");
+            renderPreview(payload);
+            setStatus("Apercu genere.");
           })
-          .withFailureHandler(function(err) {
-            setStatus("Erreur : " + err.message);
+          .withFailureHandler(function(error) {
+            setStatus("Erreur apercu : " + (error && error.message ? error.message : error), true);
           })
-          .genererApercuRecapVincennesP1(form);
+          .genererApercuRecapSiteP1(form);
       }
 
       function envoyerMail() {
         let form;
         try {
           form = collectForm();
-        } catch(e) {
-          setStatus(e.message);
+        } catch (error) {
+          setStatus(error.message || String(error), true);
           return;
         }
 
-        setStatus("Envoi du mail…");
+        setStatus("Envoi du mail en cours...");
         google.script.run
           .withSuccessHandler(function(message) {
-            setStatus(message);
+            setStatus(message || "Mail envoye.");
           })
-          .withFailureHandler(function(err) {
-            setStatus("Erreur : " + err.message);
+          .withFailureHandler(function(error) {
+            setStatus("Erreur mail : " + (error && error.message ? error.message : error), true);
           })
-          .envoyerRecapVincennesP1(form);
+          .envoyerRecapSiteP1(form);
       }
 
       function lancerExport() {
         let form;
         try {
           form = collectForm();
-        } catch(e) {
-          setStatus(e.message);
+        } catch (error) {
+          setStatus(error.message || String(error), true);
           return;
         }
 
-        setStatus("Génération de l’export…");
+        setStatus("Generation de l'export en cours...");
         google.script.run
           .withSuccessHandler(function(url) {
-            const box = document.getElementById("exportLinkBox");
-            box.style.display = "block";
-            box.innerHTML = `Export généré : <a href="${url}" target="_blank">ouvrir le fichier</a>`;
-            setStatus("Export généré.");
+            $("exportLinkText").innerHTML = `Export genere : <a href="${url}" target="_blank">ouvrir le fichier</a>`;
+            setStatus("Export genere.");
           })
-          .withFailureHandler(function(err) {
-            setStatus("Erreur export : " + err.message);
+          .withFailureHandler(function(error) {
+            setStatus("Erreur export : " + (error && error.message ? error.message : error), true);
           })
           .lancerExport(form);
       }
 
-      ["dateDebut", "dateFin", "emailLibre", "typeExport", "formatExport"].forEach(id => {
-        document.getElementById(id).addEventListener("input", updateFormSummary);
-        document.getElementById(id).addEventListener("change", updateFormSummary);
-      });
-      document.getElementById("emailChoisi").addEventListener("change", toggleCustomEmail);
+      function bind() {
+        document.querySelectorAll(".preset").forEach(function(button) {
+          button.addEventListener("click", function() {
+            applyPreset(button.dataset.preset, button);
+          });
+        });
 
-      google.script.run
-        .withSuccessHandler(function(data) {
-          initForm(data);
-        })
-        .withFailureHandler(function() {
-          setStatus("Erreur chargement destinataires, utilisation de la liste par défaut.");
-          initForm(null);
-        })
-        .getDialogDefaultsP1_();
+        ["dateDebut", "dateFin", "emailLibre", "typeExport", "formatExport"].forEach(function(id) {
+          $(id).addEventListener("input", updateFormSummary);
+          $(id).addEventListener("change", updateFormSummary);
+        });
+
+        $("siteKey").addEventListener("change", function() {
+          syncSitePresentation();
+          refreshSiteConfig(true);
+          updateFormSummary();
+        });
+        $("emailChoisi").addEventListener("change", toggleCustomEmail);
+        $("previewBtn").addEventListener("click", genererPreview);
+        $("sendBtn").addEventListener("click", envoyerMail);
+        $("exportBtn").addEventListener("click", lancerExport);
+        $("closeBtn").addEventListener("click", function() {
+          google.script.host.close();
+        });
+      }
+
+      function init() {
+        bind();
+        populateSiteOptions({ siteKey: DEFAULT_SITE_KEY });
+        populateEmailOptions({});
+        syncSitePresentation();
+        toggleCustomEmail();
+        updateFormSummary();
+
+        google.script.run
+          .withSuccessHandler(function(data) {
+            populateSiteOptions(data || {});
+            populateEmailOptions(data || {});
+            if (data && data.dateDebut) $("dateDebut").value = data.dateDebut;
+            if (data && data.dateFin) $("dateFin").value = data.dateFin;
+            syncSitePresentation();
+            toggleCustomEmail();
+            updateFormSummary();
+          })
+          .withFailureHandler(function(error) {
+            setStatus("Erreur chargement initial : " + (error && error.message ? error.message : error), true);
+            syncSitePresentation();
+            toggleCustomEmail();
+            updateFormSummary();
+          })
+          .getDialogDefaultsP1_(DEFAULT_SITE_KEY);
+      }
+
+      init();
     </script>
   </body>
 </html>

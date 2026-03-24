@@ -1,237 +1,187 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nouvel événement</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 12px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      margin-bottom: 4px;
-      font-weight: 600;
-    }
-    input, select, textarea {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 8px;
-      margin-bottom: 4px;
-    }
-    .spaces, .bloc {
-      border: 1px solid #ddd;
-      padding: 8px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-    }
-    .spaces {
-      max-height: 180px;
-      overflow-y: auto;
-    }
-    .space-item, .inline-check {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: normal;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      background: #1a73e8;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 10px;
-      border-radius: 6px;
-    }
-    .msg {
-      margin-top: 12px;
-      padding: 8px;
-      border-radius: 6px;
-      white-space: pre-wrap;
-    }
-    .ok { background: #e6f4ea; }
-    .err { background: #fce8e6; }
-    .warn { background: #fff4e5; }
-    h4 {
-      margin: 0 0 8px 0;
-    }
-    .hidden {
-      display: none;
-    }
+    :root{--bg:#f4f7fb;--card:#fff;--line:#dce6f0;--text:#152033;--muted:#61748a;--accent:#0f766e;--accent2:#115e59;--soft:#dff7f0;--warn:#fff7ed;--warn-text:#b45309;--ok:#dcfce7;--ok-text:#166534;--err:#fee4e2;--err-text:#b42318;--shadow:0 16px 38px rgba(15,23,42,.08);--radius:22px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0;background:linear-gradient(180deg,#f8fbff 0%,var(--bg) 100%);color:var(--text);font-family:Arial,sans-serif}
+    body{padding:18px} .page{max-width:1080px;margin:0 auto} .hero,.card{background:var(--card);border:1px solid #e8eef5;border-radius:28px;box-shadow:var(--shadow)}
+    .hero{padding:22px 24px 18px;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,#f7fffc 60%,#fffaf4 100%)} .pill{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;background:var(--soft);border:1px solid #a7e7d6;color:var(--accent2);font-size:12px;font-weight:800}
+    h1{margin:14px 0 6px;font-size:30px;line-height:1.05;letter-spacing:-.04em}.sub{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+    .layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.95fr);gap:16px}.card{padding:20px}.section{border:1px solid #edf2f7;border-radius:18px;padding:16px;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%)} .stack{display:flex;flex-direction:column;gap:14px}
+    .head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}.title{margin:0;font-size:17px;font-weight:800}.help{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+    .badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;background:#f3f7fb;border:1px solid #e1e8f0;color:#46607e;font-size:12px;font-weight:800;white-space:nowrap}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row{margin-bottom:12px}.row:last-child{margin-bottom:0} label{display:block;margin-bottom:7px;font-size:13px;font-weight:800}
+    .label-line{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px}.hint{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.45}
+    input,select,textarea,button{font:inherit} input,select,textarea{width:100%;padding:12px 14px;border:1px solid #ced8e4;border-radius:14px;background:#fff;color:var(--text)} input:focus,select:focus,textarea:focus{outline:none;border-color:#7bcdbd;box-shadow:0 0 0 4px rgba(15,118,110,.12)} textarea{min-height:110px;resize:vertical}
+    .mini,.space-btn,.secondary,.primary{cursor:pointer;transition:.15s ease} .mini,.space-btn{border:1px solid #d7e1eb;background:#fff;color:var(--text);border-radius:999px;padding:8px 11px;font-size:12px;font-weight:700}
+    .mini.danger{border-color:#fecaca;background:#fff1f2;color:#b42318}.manager-actions{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}.manager-actions .row{flex:1 1 220px;margin:0}.manager-actions .mini{white-space:nowrap}
+    .mini:hover,.space-btn:hover,.secondary:hover,.primary:hover{transform:translateY(-1px)} .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.search{flex:1 1 220px}
+    .spaces-wrap{border:1px solid var(--line);border-radius:18px;background:#fbfdff;overflow:hidden}.spaces{max-height:240px;overflow-y:auto;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .space{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e4ebf3;border-radius:14px;background:#fff;cursor:pointer}.space input,.toggle input{width:auto;margin:0;accent-color:var(--accent)} .space-name{font-size:13px;font-weight:700;line-height:1.3}
+    .empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}.toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:#f7fafc;border:1px solid #e4ebf3}
+    .summary{position:sticky;top:18px}.summary h2{margin:0 0 6px;font-size:20px}.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.sum{border:1px solid #e5ebf2;border-radius:16px;background:#f8fbfe;padding:12px}.sum-label{display:block;margin-bottom:5px;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.sum-value{font-size:13px;font-weight:700;line-height:1.4;word-break:break-word}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{display:inline-flex;align-items:center;padding:8px 10px;border-radius:999px;background:#f3f7fb;border:1px solid #e0e8f1;color:#41536b;font-size:12px;font-weight:700}
+    .actions{display:flex;gap:10px;margin-top:16px}.secondary,.primary{flex:1;border:none;border-radius:16px;padding:13px 16px;font-size:14px;font-weight:800}.secondary{background:#eef4f8;color:var(--text);border:1px solid #d9e4ee}.primary{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);color:#fff;box-shadow:0 12px 24px rgba(17,94,89,.22)} .primary[disabled],.secondary[disabled]{opacity:.72;cursor:wait;transform:none;box-shadow:none}
+    .msg{margin-top:16px;padding:14px 16px;border-radius:16px;border:1px solid transparent;white-space:pre-wrap;line-height:1.5;font-size:13px}.ok{background:var(--ok);color:var(--ok-text);border-color:#bbf7d0}.err{background:var(--err);color:var(--err-text);border-color:#fecaca}.warn{background:var(--warn);color:var(--warn-text);border-color:#fed7aa}.hidden{display:none}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}.summary{position:static}} @media (max-width:720px){body{padding:12px}.hero,.card{padding:16px}.grid,.spaces,.summary-grid,.actions{grid-template-columns:1fr;display:grid}.actions{gap:8px}}
   </style>
 </head>
 <body>
-  <h3>Nouvel événement</h3>
+  <div class="page">
+    <div class="hero">
+      <div class="pill">Agenda événements</div>
+      <h1>Créer un événement</h1>
+      <p class="sub">Une saisie plus claire, un résumé en direct, une meilleure gestion des séries et des espaces, sans changer votre logique de création actuelle.</p>
+    </div>
+    <div class="layout">
+      <div class="card">
+        <div class="stack">
+          <div class="section">
+            <div class="head"><div><h2 class="title">Contexte</h2><p class="help">Le minimum utile pour placer l'événement dans le bon agenda.</p></div><span class="badge" id="siteBadge">Vincennes</span></div>
+            <div class="row"><label for="site">Site</label><select id="site"><option value="VINCENNES">Vincennes</option><option value="ENGHIEN">Enghien</option></select></div>
+            <div class="row"><label for="title">Titre de l'événement</label><input id="title" type="text" placeholder="Ex. Brunch Live Nation #1 KPOP"><div class="hint">Le titre reste libre. Les champs série et thématique servent au regroupement intelligent.</div></div>
+            <div class="grid">
+              <div class="row"><label for="start">Début</label><input id="start" type="datetime-local"></div>
+              <div class="row"><label for="end">Fin</label><input id="end" type="datetime-local"></div>
+            </div>
+          </div>
 
-  <label>Site</label>
-  <select id="site" onchange="loadSpaces()">
-    <option value="ENGHIEN">Enghien</option>
-    <option value="VINCENNES">Vincennes</option>
-  </select>
+          <div class="section">
+            <div class="head"><div><h2 class="title">Métier</h2><p class="help">Ces champs alimentent la description, les exports et les récapitulatifs.</p></div><span class="badge" id="durationBadge">Durée à définir</span></div>
+            <div class="row">
+              <div class="label-line"><label for="manager">Responsable</label><span class="hint">Liste gérée par site</span></div>
+              <select id="manager"><option value="">Chargement...</option></select>
+              <div class="manager-actions">
+                <div class="row">
+                  <label for="managerDraft">Ajouter un responsable</label>
+                  <input id="managerDraft" type="text" placeholder="Nom du responsable">
+                </div>
+                <button type="button" class="mini" id="addManagerBtn">Ajouter</button>
+                <button type="button" class="mini danger" id="removeManagerBtn">Supprimer</button>
+              </div>
+            </div>
+            <div class="grid">
+              <div class="row"><label for="type">Type</label><select id="type"><option value="B2C">B2C</option><option value="B2B">B2B</option></select></div>
+              <div class="row"><label for="pax">PAX</label><input id="pax" type="number" min="0" placeholder="Ex. 250"></div>
+            </div>
+            <div class="row"><label for="theme">Thématique</label><input id="theme" type="text" placeholder="Ex. KPOP, Urbain, SG 3"></div>
+          </div>
 
-  <label>Titre</label>
-  <input type="text" id="title">
+          <div class="section">
+            <div class="head"><div><h2 class="title">Série</h2><p class="help">Activez-la seulement si cet événement fait partie d'un ensemble multidates.</p></div><span class="badge" id="seriesBadge">Événement simple</span></div>
+            <div class="stack">
+              <label class="toggle"><input id="isMultidate" type="checkbox"><div><strong>Cet événement est un multidates</strong><div class="hint">Affiche les champs de regroupement pour les occurrences liées.</div></div></label>
+              <div id="seriesFields" class="hidden">
+                <div class="grid">
+                  <div class="row">
+                    <div class="label-line"><label for="seriesName">Nom de série</label><button type="button" class="mini" id="copyTitleBtn">Reprendre le titre</button></div>
+                    <input id="seriesName" type="text" placeholder="Ex. Brunchs Live Nation">
+                  </div>
+                  <div class="row">
+                    <div class="label-line"><label for="seriesId">Série ID</label><button type="button" class="mini" id="seriesIdBtn">Générer</button></div>
+                    <input id="seriesId" type="text" placeholder="Ex. LIVE_NATION_BRUNCH_2026">
+                  </div>
+                </div>
+                <div class="hint" id="seriesPreview">Renseignez un nom de série ou un titre pour obtenir une proposition de Série ID.</div>
+              </div>
+            </div>
+          </div>
 
-  <label>Début</label>
-  <input type="datetime-local" id="start">
+          <div class="section">
+            <div class="head"><div><h2 class="title">Espaces</h2><p class="help">Recherchez puis sélectionnez rapidement les espaces utiles.</p></div><span class="badge" id="spaceBadge">0 espace</span></div>
+            <div class="toolbar">
+              <input id="spaceSearch" class="search" type="text" placeholder="Rechercher un espace...">
+              <button type="button" class="space-btn" id="selectVisibleBtn">Tout sélectionner</button>
+              <button type="button" class="space-btn" id="clearSpacesBtn">Tout effacer</button>
+            </div>
+            <div class="spaces-wrap"><div id="spaces" class="spaces"></div></div>
+          </div>
 
-  <label>Fin</label>
-  <input type="datetime-local" id="end">
+          <div class="section">
+            <div class="head"><div><h2 class="title">Options complémentaires</h2><p class="help">Affichez uniquement les sous-sections utiles pour alléger la saisie.</p></div></div>
+            <div class="stack">
+              <label class="toggle"><input id="visiteGuidee" type="checkbox"><div><strong>Visite guidée</strong><div class="hint">Ajoute les informations dédiées dans la description.</div></div></label>
+              <div id="visiteFields" class="hidden">
+                <div class="grid">
+                  <div class="row"><label for="visiteDate">Date visite guidée</label><input id="visiteDate" type="date"></div>
+                  <div class="row"><label for="visiteHeure">Heure visite guidée</label><input id="visiteHeure" type="time"></div>
+                </div>
+                <div class="row"><label for="visitePax">PAX visite guidée</label><input id="visitePax" type="number" min="0" placeholder="Ex. 40"></div>
+              </div>
+              <label class="toggle"><input id="pmuBorne" type="checkbox"><div><strong>PMU</strong> Mise en marche de borne</div></label>
+              <label class="toggle"><input id="pmuBonApartir" type="checkbox"><div><strong>PMU</strong> Bon à partir</div></label>
+              <label class="toggle"><input id="pmuInitiation" type="checkbox"><div><strong>PMU</strong> Initiation aux paris</div></label>
+              <div class="row"><label for="notes">Notes complémentaires</label><textarea id="notes" placeholder="Informations libres à ajouter dans la description..."></textarea></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <label>Responsable</label>
-  <input type="text" id="manager">
-
-  <label>Type</label>
-  <select id="type">
-    <option value="B2B">B2B</option>
-    <option value="B2C">B2C</option>
-  </select>
-
-  <label>PAX</label>
-  <input type="number" id="pax">
-
-  <label>Espaces</label>
-  <div id="spaces" class="spaces"></div>
-
-  <div class="bloc">
-    <h4>Visite guidée</h4>
-    <label class="inline-check">
-      <input type="checkbox" id="visiteGuidee" onchange="toggleVisiteGuidee()"> Oui
-    </label>
-
-    <div id="visiteGuideeFields" class="hidden">
-      <label>Date visite guidée</label>
-      <input type="date" id="visiteDate">
-
-      <label>Heure visite guidée</label>
-      <input type="time" id="visiteHeure">
-
-      <label>Nb de pax visite guidée</label>
-      <input type="number" id="visitePax">
+      <div class="card summary">
+        <h2>Résumé en direct</h2>
+        <p class="sub">Le formulaire vous aide à repérer les oublis avant création.</p>
+        <div class="summary-grid">
+          <div class="sum"><span class="sum-label">Site</span><div class="sum-value" id="sumSite">Vincennes</div></div>
+          <div class="sum"><span class="sum-label">Type</span><div class="sum-value" id="sumType">B2C</div></div>
+          <div class="sum"><span class="sum-label">Titre</span><div class="sum-value" id="sumTitle">À renseigner</div></div>
+          <div class="sum"><span class="sum-label">Durée</span><div class="sum-value" id="sumDuration">À définir</div></div>
+          <div class="sum"><span class="sum-label">Série</span><div class="sum-value" id="sumSeries">Aucune</div></div>
+          <div class="sum"><span class="sum-label">Espaces</span><div class="sum-value" id="sumSpaces">Aucun espace sélectionné</div></div>
+        </div>
+        <div class="chips">
+          <div class="chip" id="chipDates">Dates à confirmer</div>
+          <div class="chip" id="chipSeries">Série facultative</div>
+          <div class="chip" id="chipSpaces">Espaces non sélectionnés</div>
+        </div>
+        <div class="actions">
+          <button type="button" class="secondary" id="resetBtn">Réinitialiser</button>
+          <button type="button" class="primary" id="submitBtn">Créer l'événement</button>
+        </div>
+        <div id="message" class="msg hidden"></div>
+      </div>
     </div>
   </div>
 
-  <div class="bloc">
-    <h4>PMU</h4>
-    <label class="inline-check">
-      <input type="checkbox" id="pmuBorne"> Mise en marche de borne
-    </label>
-    <label class="inline-check">
-      <input type="checkbox" id="pmuBonApartir"> Bon à partir
-    </label>
-    <label class="inline-check">
-      <input type="checkbox" id="pmuInitiation"> Initiation aux paris
-    </label>
-  </div>
-
-  <label>Notes</label>
-  <textarea id="notes" rows="5"></textarea>
-
-  <button onclick="submitForm()">Créer l’événement</button>
-
-  <div id="message" class="msg" style="display:none;"></div>
-
   <script>
-    function showMessage(text, cls) {
-      const el = document.getElementById('message');
-      el.style.display = 'block';
-      el.className = 'msg ' + cls;
-      el.textContent = text;
-    }
-
-    function toggleVisiteGuidee() {
-      const checked = document.getElementById('visiteGuidee').checked;
-      document.getElementById('visiteGuideeFields').classList.toggle('hidden', !checked);
-    }
-
-    function loadSpaces() {
-      const site = document.getElementById('site').value;
-      google.script.run.withSuccessHandler(function(spaces) {
-        const container = document.getElementById('spaces');
-        container.innerHTML = '';
-
-        (spaces || []).forEach(function(space, idx) {
-          const label = document.createElement('label');
-          label.className = 'space-item';
-
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.value = space;
-          cb.id = 'space_' + idx;
-
-          label.appendChild(cb);
-          label.appendChild(document.createTextNode(' ' + space));
-          container.appendChild(label);
-        });
-      }).getSpacesForForm_(site);
-    }
-
-    function getSelectedSpaces() {
-      const cbs = document.querySelectorAll('#spaces input[type="checkbox"]:checked');
-      return Array.from(cbs).map(cb => cb.value);
-    }
-
-    function createEventFromForm(data) {
-  const siteKey = data.site;
-  const cfg = getSiteConfig_(siteKey);
-
-  const calendarId = cfg.calendarEvents;
-  const cal = CalendarApp.getCalendarById(calendarId);
-  if (!cal) {
-    throw new Error("Agenda événements introuvable pour " + cfg.label);
-  }
-
-  const start = new Date(data.start);
-  const end = new Date(data.end);
-
-  const lignes = [
-    "Responsable: " + (data.manager || ""),
-    "Type: " + (data.type || "B2C"),
-    "PAX: " + (data.pax || ""),
-    "Espaces: " + ((data.spaces || []).join(", "))
-  ];
-
-  if (data.visiteGuidee) {
-    lignes.push("Visite guidée: OUI");
-    lignes.push("Visite guidée - Date: " + (data.visiteDate || ""));
-    lignes.push("Visite guidée - Heure: " + (data.visiteHeure || ""));
-    lignes.push("Visite guidée - PAX: " + (data.visitePax || ""));
-  } else {
-    lignes.push("Visite guidée: NON");
-  }
-
-  lignes.push("PMU - Mise en marche borne: " + (data.pmuBorne ? "OUI" : "NON"));
-  lignes.push("PMU - Bon à partir: " + (data.pmuBonApartir ? "OUI" : "NON"));
-  lignes.push("PMU - Initiation aux paris: " + (data.pmuInitiation ? "OUI" : "NON"));
-
-  if (data.notes) {
-    lignes.push("");
-    lignes.push(data.notes);
-  }
-
-  const description = lignes.join("\n");
-
-  cal.createEvent(
-    data.title,
-    start,
-    end,
-    {
-      description: description
-    }
-  );
-
-  synchroniserCalendriersVersFeuille(siteKey);
-
-  return {
-    ok: true,
-    message: "Événement créé sur " + cfg.label
-  };
-}
-
-    loadSpaces();
-    toggleVisiteGuidee();
+    let allSpaces = [];
+    let allManagers = [];
+    let selectedSpaceKeys = new Set();
+    let seriesIdTouched = false;
+    function $(id){return document.getElementById(id);}
+    function showMessage(text,cls){const el=$("message");el.className="msg "+cls;el.textContent=text;el.classList.remove("hidden");}
+    function clearMessage(){const el=$("message");el.className="msg hidden";el.textContent="";}
+    function setLoading(v){$("submitBtn").disabled=v;$("resetBtn").disabled=v;$("submitBtn").textContent=v?"Création en cours...":"Créer l'événement";}
+    function escapeHtml(v){return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+    function escapeAttr(v){return escapeHtml(v).replace(/"/g,"&quot;");}
+    function siteLabel(v){return v==="ENGHIEN"?"Enghien":"Vincennes";}
+    function slugify(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9]+/g,"_").replace(/^_+|_+$/g,"").replace(/_+/g,"_");}
+    function getSuggestedSeriesId(){if(!$("isMultidate").checked)return"";const base=$("seriesName").value.trim()||$("title").value.trim();const theme=slugify($("theme").value.trim());const year=$("start").value?String(new Date($("start").value).getFullYear()):"";return [slugify(base),theme,year].filter(Boolean).join("_");}
+    function getSpaceKey(space){return String(space&&(space.key||space.email||space.norm||space.label)||"");}
+    function getSelectedSpaces(){return allSpaces.filter(function(space){return selectedSpaceKeys.has(getSpaceKey(space));});}
+    function toLocalValue(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0"),h=String(d.getHours()).padStart(2,"0"),min=String(d.getMinutes()).padStart(2,"0");return y+"-"+m+"-"+day+"T"+h+":"+min;}
+    function roundHalfHour(d){const x=new Date(d.getTime());x.setSeconds(0,0);const m=x.getMinutes();if(m<=30)x.setMinutes(30,0,0);else x.setHours(x.getHours()+1,0,0,0);return x;}
+    function ensureDefaults(){if(!$("start").value){const s=roundHalfHour(new Date());$("start").value=toLocalValue(s);}if(!$("end").value){const e=new Date($("start").value);e.setHours(e.getHours()+2);$("end").value=toLocalValue(e);}}
+    function maybeAdjustEnd(){if(!$("start").value)return updateSummary();const s=new Date($("start").value),e=$("end").value?new Date($("end").value):null;if(!e||isNaN(e)||e<=s){const n=new Date(s.getTime());n.setHours(n.getHours()+2);$("end").value=toLocalValue(n);}if($("visiteGuidee").checked&&!$("visiteDate").value){$("visiteDate").value=$("start").value.slice(0,10);}fillSeriesId(false);updateSummary();}
+    function formatDuration(){const sv=$("start").value,ev=$("end").value;if(!sv||!ev)return"À définir";const s=new Date(sv),e=new Date(ev);if(isNaN(s)||isNaN(e))return"À définir";const ms=e-s;if(ms<=0)return"Incohérente";const h=Math.floor(ms/3600000),m=Math.round((ms%3600000)/60000);return h+" h "+String(m).padStart(2,"0");}
+    function fillSeriesId(force){if(!$("isMultidate").checked){$("seriesPreview").textContent="Cochez l'option multidates pour activer les champs de série.";if(force)$("seriesId").value="";return updateSummary();}const suggested=getSuggestedSeriesId();$("seriesPreview").textContent=suggested||"Renseignez un nom de série ou un titre pour obtenir une proposition de Série ID.";if(force||!seriesIdTouched||!$("seriesId").value.trim())$("seriesId").value=suggested||"";updateSummary();}
+    function renderManagerOptions(managers,preferredValue){allManagers=(managers||[]).slice().sort(function(a,b){return String(a).localeCompare(String(b),"fr",{sensitivity:"base"});});const current=preferredValue!==undefined?preferredValue:$("manager").value;const values=allManagers.slice();if(current&&values.indexOf(current)===-1)values.push(current);let html='<option value="">Choisir...</option>';html+=values.map(function(manager){return'<option value="'+escapeAttr(manager)+'">'+escapeHtml(manager)+'</option>';}).join("");$("manager").innerHTML=html;$("manager").value=current&&values.indexOf(current)!==-1?current:"";updateSummary();}
+    function renderSpaces(){const q=$("spaceSearch").value.trim().toLowerCase(),list=allSpaces.filter(function(space){const label=String(space.label||space.email||"").toLowerCase();return!q||label.indexOf(q)!==-1;});const box=$("spaces");if(!list.length){box.innerHTML='<div class="empty">Aucune ressource ne correspond à votre recherche.</div>';return updateSummary();}box.innerHTML=list.map(function(space){const key=getSpaceKey(space),checked=selectedSpaceKeys.has(key)?" checked":"";return '<label class="space"><input type="checkbox" data-key="'+escapeAttr(key)+'"'+checked+'><span class="space-name">'+escapeHtml(space.label||space.email||"")+'</span></label>';}).join("");Array.from(box.querySelectorAll('input[type="checkbox"]')).forEach(function(cb){cb.addEventListener("change",function(){const key=cb.getAttribute("data-key");if(cb.checked)selectedSpaceKeys.add(key);else selectedSpaceKeys.delete(key);updateSummary();});});updateSummary();}
+    function loadFormOptions(){clearMessage();const currentManager=$("manager").value.trim();$("spaces").innerHTML='<div class="empty">Chargement des espaces...</div>';$("manager").innerHTML='<option value="">Chargement...</option>';google.script.run.withSuccessHandler(function(options){allSpaces=Array.isArray(options&&options.spaces)?options.spaces.slice():[];renderSpaces();renderManagerOptions(options&&options.managers||[],currentManager);}).withFailureHandler(function(error){const msg=error&&error.message?error.message:String(error);$("spaces").innerHTML='<div class="empty">'+escapeHtml(msg)+'</div>';renderManagerOptions([], "");showMessage(msg,"err");}).getEventFormOptions($("site").value);}
+    function addManager(){const name=$("managerDraft").value.trim();if(!name)return showMessage("Saisissez un responsable à ajouter.","warn");clearMessage();google.script.run.withSuccessHandler(function(managers){$("managerDraft").value="";renderManagerOptions(managers,name);showMessage("Responsable ajouté.","ok");}).withFailureHandler(function(error){showMessage(error&&error.message?error.message:String(error),"err");}).saveManagerForForm($("site").value,name);}
+    function removeManager(){const name=$("manager").value.trim();if(!name)return showMessage("Choisissez un responsable à supprimer.","warn");clearMessage();google.script.run.withSuccessHandler(function(managers){renderManagerOptions(managers,"");showMessage("Responsable supprimé.","ok");}).withFailureHandler(function(error){showMessage(error&&error.message?error.message:String(error),"err");}).deleteManagerForForm($("site").value,name);}
+    function toggleVisite(){const checked=$("visiteGuidee").checked;$("visiteFields").classList.toggle("hidden",!checked);if(checked&&$("start").value){const d=new Date($("start").value);if(!$("visiteDate").value)$("visiteDate").value=$("start").value.slice(0,10);if(!$("visiteHeure").value)$("visiteHeure").value=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}updateSummary();}
+    function toggleSeries(){const checked=$("isMultidate").checked;$("seriesFields").classList.toggle("hidden",!checked);fillSeriesId(false);updateSummary();}
+    function updateSummary(){const site=siteLabel($("site").value),title=$("title").value.trim(),isMultidate=$("isMultidate").checked,series=isMultidate?$("seriesName").value.trim():"",seriesId=isMultidate?$("seriesId").value.trim():"",spaces=getSelectedSpaces(),spaceLabels=spaces.map(function(space){return space.label||space.email||"";}),duration=formatDuration(),okDates=$("start").value&&$("end").value&&duration!=="Incohérente";$("siteBadge").textContent=site;$("sumSite").textContent=site;$("sumType").textContent=$("type").value;$("sumTitle").textContent=title||"À renseigner";$("sumDuration").textContent=duration;$("sumSeries").textContent=isMultidate?(series?(seriesId?series+" ("+seriesId+")":series):"Multidates sans série"):"Événement simple";$("sumSpaces").textContent=spaceLabels.length?spaceLabels.join(", "):"Aucun espace sélectionné";$("durationBadge").textContent=duration;$("spaceBadge").textContent=spaceLabels.length+(spaceLabels.length>1?" espaces":" espace");$("seriesBadge").textContent=isMultidate?(series||seriesId?"Multidates actif":"Multidates à renseigner"):"Événement simple";$("chipDates").textContent=okDates?"Dates cohérentes":"Dates à confirmer";$("chipSeries").textContent=isMultidate?(seriesId?"Multidates prêt":"Multidates en cours"):"Événement unique";$("chipSpaces").textContent=spaceLabels.length?"Espaces sélectionnés":"Espaces non sélectionnés";}
+    function collectData(){return{site:$("site").value,title:$("title").value.trim(),start:$("start").value,end:$("end").value,manager:$("manager").value.trim(),type:$("type").value,pax:$("pax").value,theme:$("theme").value.trim(),isMultidate:$("isMultidate").checked,seriesName:$("isMultidate").checked?$("seriesName").value.trim():"",seriesId:$("isMultidate").checked?$("seriesId").value.trim():"",spaces:getSelectedSpaces().map(function(space){return{key:getSpaceKey(space),label:space.label||"",email:space.email||"",norm:space.norm||""};}),visiteGuidee:$("visiteGuidee").checked,visiteDate:$("visiteDate").value,visiteHeure:$("visiteHeure").value,visitePax:$("visitePax").value,pmuBorne:$("pmuBorne").checked,pmuBonApartir:$("pmuBonApartir").checked,pmuInitiation:$("pmuInitiation").checked,notes:$("notes").value.trim()};}
+    function validateClient(data){if(!data.title||!data.start||!data.end)throw new Error("Merci de renseigner au minimum le titre, le début et la fin.");const s=new Date(data.start),e=new Date(data.end);if(isNaN(s)||isNaN(e))throw new Error("Les dates saisies sont invalides.");if(e<=s)throw new Error("La date de fin doit être postérieure au début.");}
+    function resetForm(){clearMessage();document.querySelectorAll("input,textarea").forEach(function(el){if(el.type==="checkbox")el.checked=false;else el.value="";});$("type").value="B2C";$("site").value="VINCENNES";$("manager").innerHTML='<option value="">Chargement...</option>';$("spaceSearch").value="";$("managerDraft").value="";allSpaces=[];allManagers=[];selectedSpaceKeys=new Set();seriesIdTouched=false;ensureDefaults();toggleVisite();toggleSeries();loadFormOptions();updateSummary();}
+    function submitForm(){clearMessage();const data=collectData();try{validateClient(data);}catch(error){showMessage(error.message||String(error),"err");return;}setLoading(true);google.script.run.withSuccessHandler(function(result){setLoading(false);if(result&&result.ok===false&&result.conflicts&&result.conflicts.length){showMessage("Conflits détectés :\n- "+result.conflicts.join("\n- "),"warn");return;}showMessage(result&&result.message?result.message:"Événement créé.","ok");}).withFailureHandler(function(error){setLoading(false);const msg=error&&error.message?error.message:String(error);showMessage(msg,"err");}).submitEventForm(data);}
+    function bind(){["title","start","end","type","pax","theme","seriesName","seriesId","notes","visiteDate","visiteHeure","visitePax"].forEach(function(id){$(id).addEventListener("input",function(){if(id==="seriesId")seriesIdTouched=true;if(id==="start")maybeAdjustEnd();if(id==="title"||id==="theme"||id==="seriesName"||id==="start")fillSeriesId(false);updateSummary();});});$("manager").addEventListener("change",updateSummary);$("site").addEventListener("change",function(){selectedSpaceKeys=new Set();$("managerDraft").value="";renderManagerOptions([], "");loadFormOptions();updateSummary();});$("isMultidate").addEventListener("change",toggleSeries);$("visiteGuidee").addEventListener("change",toggleVisite);["pmuBorne","pmuBonApartir","pmuInitiation"].forEach(function(id){$(id).addEventListener("change",updateSummary);});$("spaceSearch").addEventListener("input",renderSpaces);$("selectVisibleBtn").addEventListener("click",function(){Array.from(document.querySelectorAll('#spaces input[type="checkbox"]')).forEach(function(cb){selectedSpaceKeys.add(cb.getAttribute("data-key"));cb.checked=true;});updateSummary();});$("clearSpacesBtn").addEventListener("click",function(){selectedSpaceKeys=new Set();renderSpaces();});$("copyTitleBtn").addEventListener("click",function(){$("seriesName").value=$("title").value.trim();fillSeriesId(true);});$("seriesIdBtn").addEventListener("click",function(){seriesIdTouched=false;fillSeriesId(true);});$("addManagerBtn").addEventListener("click",addManager);$("removeManagerBtn").addEventListener("click",removeManager);$("managerDraft").addEventListener("keydown",function(event){if(event.key==="Enter"){event.preventDefault();addManager();}});$("resetBtn").addEventListener("click",resetForm);$("submitBtn").addEventListener("click",submitForm);}
+    ensureDefaults();bind();toggleVisite();toggleSeries();loadFormOptions();updateSummary();
   </script>
 </body>
 </html>
