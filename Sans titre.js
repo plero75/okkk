@@ -802,6 +802,21 @@ groupesDuMois
 const isOption = !!groupe.isOption;
 let nomAffiche = groupe.nom;
 const phasesLibelle = libellerPhasesGroupe_(groupe);
+const segments = groupe.events.map(ev => {
+  const startRaw = new Date(ev.start.date || ev.start.dateTime);
+  const endRaw = new Date(ev.end.date || ev.end.dateTime);
+  const sd = new Date(startRaw.getFullYear(), startRaw.getMonth(), startRaw.getDate());
+  const endInclusive = ev.end && ev.end.date
+    ? new Date(endRaw.getTime() - 1)
+    : endRaw;
+  const ed = new Date(endInclusive.getFullYear(), endInclusive.getMonth(), endInclusive.getDate());
+
+  return {
+    phase: detecterPhaseEvent(ev.summary),
+    sd,
+    ed
+  };
+}).filter(segment => !isNaN(segment.sd) && !isNaN(segment.ed) && segment.ed >= segment.sd);
 
     let couleurTexte = H.couleurTexteType(type);
     let hauteurBarre = "8px";
